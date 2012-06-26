@@ -193,7 +193,7 @@ foreach ( App::objects('plugins') as $plugin ) {
 }
 
 // Sort Plugins to match configuration order.
-$plugins = Set::sort( $plugins, '{n}.order', 'asc' );
+if ( !empty($plugins) ) $plugins = Set::sort( $plugins, '{n}.order', 'asc' );
 
 
 

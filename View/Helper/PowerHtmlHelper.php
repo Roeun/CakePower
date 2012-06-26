@@ -205,6 +205,72 @@ class PowerHtmlHelper extends HtmlHelper {
 	
 	
 	
+/**	
+ * OVERRIDE
+ * adds the ability to import a require.js script with a CakePHP notated "data-main" option.
+ */
+	public function script($url, $options = array()) {
+		if (is_bool($options)) {
+			list($inline, $options) = array($options, array());
+			$options['inline'] = $inline;
+		}
+		$options = array_merge(array('block' => null, 'inline' => true, 'once' => true), $options);
+		if (!$options['inline'] && empty($options['block'])) {
+			$options['block'] = __FUNCTION__;
+		}
+		unset($options['inline']);
+
+		if (is_array($url)) {
+			$out = '';
+			foreach ($url as $i) {
+				$out .= "\n\t" . $this->script($i, $options);
+			}
+			if (empty($options['block'])) {
+				return $out . "\n";
+			}
+			return null;
+		}
+		if ($options['once'] && isset($this->_includedScripts[$url])) {
+			return null;
+		}
+		$this->_includedScripts[$url] = true;
+
+		if (strpos($url, '//') === false) {
+			$url = $this->assetUrl($url, $options + array('pathPrefix' => JS_URL, 'ext' => '.js'));
+
+			if (Configure::read('Asset.filter.js')) {
+				$url = str_replace(JS_URL, 'cjs/', $url);
+			}
+		}
+		
+		
+		
+		
+		/** @@CakePOWER@@ **/
+		if ( strpos($url,'require') !== false && isset($options['data-main']) && strpos($options['data-main'],'//') === false ) {
+			$options['data-main'] = $this->assetUrl($options['data-main'], $options + array('pathPrefix' => JS_URL, 'ext' => '.js'));
+		}
+		/** --CakePOWER-- **/
+		
+		
+		
+		
+		
+		$attributes = $this->_parseAttributes($options, array('block', 'once'), ' ');
+		
+		$out = sprintf($this->_tags['javascriptlink'], $url, $attributes);
+
+		if (empty($options['block'])) {
+			return $out;
+		} else {
+			$this->_View->append($options['block'], $out);
+		}
+	}
+	
+	
+	
+	
+	
 	
 	
 	
