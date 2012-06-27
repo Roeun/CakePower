@@ -248,7 +248,7 @@ class PowerHtmlHelper extends HtmlHelper {
 		
 		/** @@CakePOWER@@ **/
 		if ( strpos($url,'require') !== false && isset($options['data-main']) && strpos($options['data-main'],'//') === false ) {
-			$options['data-main'] = $this->assetUrl($options['data-main'], $options + array('pathPrefix' => JS_URL, 'ext' => '.js'));
+			$options['data-main'] = $this->assetUrl($options['data-main'], array('pathPrefix' => JS_URL, 'ext' => '.js'));
 		}
 		/** --CakePOWER-- **/
 		

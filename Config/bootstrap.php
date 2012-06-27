@@ -203,6 +203,25 @@ foreach ( $plugins as $plugin ) {
 	
 	if ( $plugin == 'CakePower' ) continue;
 	
+	
+	/**
+	 * Plugins Loading Events
+	 * here CakePower trigger two events to allow other plugins to control loading flow.
+	 * it is possible to listen to this event and prevent a plugin to be loaded by 
+	 * passing a "skip" parameter to the event result array. 
+	 */
+	
+	// Dispatch General Plugin Event 
+	$e = new CakeEvent('CakePower.beforeLoadPlugin',null,$plugin);
+	CakeEventManager::instance()->dispatch($e);
+	if ( !empty($e->result['skip']) ) continue;
+	
+	
+	
+	/**
+	 * Load the plugin
+	 */
+	
 	CakePlugin::load( $plugin['_info']['name'], $plugin['_info']['load'] );
 	
 	// Check if plugin has been loaded and queque it into the PowerConfig data.
@@ -214,6 +233,12 @@ foreach ( $plugins as $plugin ) {
 // Set up loaded plugins info to the app configuration key.
 PowerConfig::set( 'app.plugins', CakePlugin::loaded() );
 
+
+
+/**
+ * Event: "pluginsLoaded()"
+ */
+CakeEventManager::instance()->dispatch( new CakeEvent('CakePower.pluginsLoaded') );
 
 
 
