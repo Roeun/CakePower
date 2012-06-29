@@ -72,3 +72,91 @@ function resetAverageTime() {
 	@unlink( TMP . 'averageTime.txt' );
 	
 } // EndOf: "resetAverageTime()" ##################################################################
+
+
+
+
+
+
+
+
+
+
+/**
+ * Self Request Utilities
+ */
+
+function powerSelfProtocol() {
+	
+	$s = empty($_SERVER["HTTPS"]) ? '' : ($_SERVER["HTTPS"] == "on") ? "s" : "";
+	 
+	return powerStrLeft(strtolower($_SERVER["SERVER_PROTOCOL"]), "/").$s;
+	
+}
+
+function powerSelfPort() {
+	
+	return ($_SERVER["SERVER_PORT"] == "80") ? "" : (":".$_SERVER["SERVER_PORT"]);
+	
+}
+
+function powerSelfHost() {
+	
+	return $_SERVER['SERVER_NAME'];
+	
+}
+
+function powerSelfUri() {
+	
+	return $_SERVER['REQUEST_URI'];
+
+}
+
+function powerSelfHref() {
+	 
+	return powerSelfProtocol() . "://". powerSelfHost() . powerSelfPort() . powerSelfUri() ;
+	 
+}
+
+function powerSelfUrl() {
+	
+	$tmp = powerSelfHref();
+	
+	if ( strpos($tmp,'?') !== false ) {
+		
+		$tmp = explode( '?', $tmp );
+
+		$tmp = $tmp[0];
+		
+	} 
+	
+	return $tmp;
+
+}
+
+function powerSelfSearch() {
+	
+	$tmp = powerSelfHref();
+	
+	if ( strpos($tmp,'?') !== false ) {
+		
+		$tmp = explode( '?', $tmp );
+
+		$tmp = $tmp[1];
+		
+	} else $tmp = '';
+	
+	return $tmp;
+
+}
+
+function powerStrLeft($s1, $s2) {
+	 
+	return substr($s1, 0, strpos($s1, $s2));
+	 
+}
+ 
+
+
+
+

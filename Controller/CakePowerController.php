@@ -70,7 +70,7 @@ class CakePowerController extends Controller {
 	
 	
 	
-	
+	/*
 	public function invokeAction(CakeRequest $request) {
 		
 		try {
@@ -86,14 +86,14 @@ class CakePowerController extends Controller {
 
 		} catch (ReflectionException $e) {
 			
-			/** @@CakePOWER@@ **/
+			/** @@CakePOWER@@ **
 			// Services... //
 			$private_method = '__' . $request->params['action'];
 			try {
 				$method = new ReflectionMethod($this, $private_method);
 				return $method->invokeArgs($this, $request->params['pass']);
 			} catch (ReflectionException $e) {}
-			/** ##CakePOWER## **/
+			/** ##CakePOWER## **
 			
 			
 			if ($this->scaffold !== false) {
@@ -105,5 +105,8 @@ class CakePowerController extends Controller {
 			));
 		}
 	}
-
+	*/
+	
+	
+	
 }

@@ -21,6 +21,7 @@ define( 'POWER_START', microtime() );
 
 // Utilities
 App::import( 'Vendor', 'CakePower.Basics' );
+App::import( 'Vendor', 'CakePower.Ua' );
 App::import( 'Vendor', 'CakePower.PowerSet' );
 App::import( 'Vendor', 'CakePower.PowerString' );
 App::import( 'Vendor', 'CakePower.PowerConfig' );
@@ -67,7 +68,21 @@ PowerConfig::set(array(
 	
 	
 	// store info about the actual request.
-	'request' => array(),
+	'request' => array(
+		
+		// Some info about the window url location fetched from the server side info
+		'location' => array(
+			
+			'href' 		=> powerSelfHref(),
+			'url'		=> powerSelfUrl(),
+			'search'	=> powerSelfSearch()
+			
+		),
+		
+		// Cliente recognition library
+		'ua' => ua()
+	
+	),
 	
 	
 	// store info about plugin's configuration.
