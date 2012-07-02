@@ -361,6 +361,78 @@ class PowerHtmlHelper extends HtmlHelper {
 		
 	}
 	
+
+/**	
+ * Utility to create a DOM named item form a view's block of data.
+ * 
+ * It uses VIEW::fetch() to grab contents from desired view block then creates
+ * a DOM item (div as default) with block's name as ID property.
+ * 
+ * You can customize default tagName and all DOM options used in the "tag()" method.
+ * 
+ * $this->Html->block( 'sidebar' ) --> <div id="sidebar">... sidebar content ...</div>
+ * $this->Html->block( 'sidebar', 'col-dx' ) --> <div id="sidebar" class="col-dx">... sidebar content ...</div>
+ * $this->Html->block( 'sidebar', array( 'class'=>'col-dx', 'style'=>'text-align:right' ) ) --> <div id="sidebar" class="col-dx" style="text-align:right">... sidebar content ...</div>
+ * 
+ * // full array configuration
+ * $this->Html->block(array(
+ * 	'name' 		=> 'sidebar',
+ * 	'class' 	=> 'col-dx',
+ * 	'style' 	=> 'text-align:right',
+ * 	'tagName' 	=> 'p'
+ * ));
+ * 
+ * --> <p id="sidebar" class="col-dx" style="text-align:right">... sidebar content ...</p>
+ * 
+ * Blog's Entry:
+ * http://movableapp.com/2012/07/cakephp-using-view-blocks-the-cakepower-way/
+ * 
+ */
+	public function block( $id, $options = array() ) {
+		
+		// allow a full-array configuration
+		if ( is_array($id) ) {
+			
+			$id += array( 'name'=>'' );
+			
+			$options = $id;
+			
+			$id = $options['name'];
+			
+			unset($options['name']);
+			
+		}
+		
+		// class as string parameter
+		if ( is_string($options) ) $options = array( 'class'=>$options );
+		
+		// options default values
+		$options += array(
+			'id'			=> $id,
+			'tagName'		=> 'div',
+			'hideOnEmpty' 	=> false 
+		);
+		
+		// fetch the text
+		$content = $this->_View->fetch( $id );
+		
+		// option "hideOnEmpty" check
+		if ( empty($content) && $options['hideOnEmpty'] !== false ) return;
+		unset($options['hideOnEmpty']);
+		
+		// extract the tagName from the config options
+		$tagName = $options['tagName'];
+		unset($options['tagName']);
+		
+		// return the block
+		return $this->tag(array(
+			'name' 		=> $tagName,
+			'content'	=> $content,
+			'options'	=> $options
+		));
+	
+	}
+	
 	
 	
 /**	
