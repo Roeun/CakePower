@@ -294,6 +294,19 @@ class PowerHtmlHelper extends HtmlHelper {
  * You can nest how many declarations as you wish/need containing code verbosity of
  * declarate many temporary vars!
  * 
+ * // Full array configuration:
+ * echo $this->Html->tag(array(
+ * 		'name' 	=> 'div',
+ * 		'class' => 'class1 class2',
+ * 		'id'	=> 'tag-id',
+ * 		'content' => array(
+ * 			'row1',
+ * 			$this->Html->link( .. ),
+ * 			'another content',
+ *  		$this->Html->tag( 'p', 'test' ) // nested tag
+ * 		)
+ * ));
+ * 
  * 
  * @param unknown_type $name
  * @param unknown_type $text
@@ -301,11 +314,22 @@ class PowerHtmlHelper extends HtmlHelper {
  */	
 	public function tag( $name, $text = null, $options = array()) {
 		
+		// Full array configuration.
+		// allow to set up every option in a single array.
 		if ( is_array($name) ) {
 			
-			$name += array( 'name'=>'', 'content'=>'', 'options'=>array() );
+			$name += array( 'name'=>'div', 'content'=>'', 'options'=>array() );
 			
-			return $this->tag( $name['name'], $name['content'], $name['options'] );
+			$tagName = $name['name'];
+			unset($name['name']);
+			
+			$content = $name['content'];
+			unset($name['content']);
+			
+			$name = PowerSet::merge( $name, $name['options'] );
+			unset($name['options']);
+			
+			return $this->tag( $tagName, $content, $name );
 			
 		} 
 		
