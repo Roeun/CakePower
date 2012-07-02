@@ -88,6 +88,9 @@ function resetAverageTime() {
 
 function powerSelfProtocol() {
 	
+	// these info are not available to SHELL!
+	if ( empty($_SERVER["HTTPS"]) || empty($_SERVER["SERVER_PROTOCOL"]) ) return;
+	
 	$s = empty($_SERVER["HTTPS"]) ? '' : ($_SERVER["HTTPS"] == "on") ? "s" : "";
 	 
 	return powerStrLeft(strtolower($_SERVER["SERVER_PROTOCOL"]), "/").$s;
@@ -96,17 +99,26 @@ function powerSelfProtocol() {
 
 function powerSelfPort() {
 	
+	// these info are not available to SHELL!
+	if ( empty($_SERVER["SERVER_PORT"]) ) return;
+	
 	return ($_SERVER["SERVER_PORT"] == "80") ? "" : (":".$_SERVER["SERVER_PORT"]);
 	
 }
 
 function powerSelfHost() {
 	
+	// these info are not available to SHELL!
+	if ( empty($_SERVER["SERVER_NAME"]) ) return;
+	
 	return $_SERVER['SERVER_NAME'];
 	
 }
 
 function powerSelfUri() {
+	
+	// these info are not available to SHELL!
+	if ( empty($_SERVER["REQUEST_URI"]) ) return;
 	
 	return $_SERVER['REQUEST_URI'];
 

@@ -385,6 +385,28 @@ class PowerHtmlHelper extends HtmlHelper {
 		
 	}
 	
+	
+	public function p( $text = '', $options = array() ) {
+		
+		// Full array configuration
+		if ( is_array($text) ) {
+			
+			$options = $text += array( 'content'=>'' );
+			
+			$text = $options['content'];
+			unset($options['content']);
+		
+		}
+		
+		$options += array( 'class'=>'' );
+		
+		$class = $options['class'];
+		unset($options['class']);
+		
+		return $this->para( $class, $text, $options );
+		
+	}
+	
 
 /**	
  * Utility to create a DOM named item form a view's block of data.
