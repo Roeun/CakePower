@@ -182,6 +182,7 @@ class PowerHtmlHelper extends HtmlHelper {
 		
 		
 		/** @@CakePOWER@@ **/
+		/* apply conditional comment */
 		if ( !empty($options['if']) ) {
 			$out = '<!--[if ' . $options['if'] . ']>' . $out . '<![endif]-->';
 		}
@@ -222,9 +223,45 @@ class PowerHtmlHelper extends HtmlHelper {
 
 		if (is_array($url)) {
 			$out = '';
+			
+			/** @@CakePOWER@@ **/
+			/*
 			foreach ($url as $i) {
 				$out .= "\n\t" . $this->script($i, $options);
 			}
+			*/
+			/**
+			 * DOC:
+			 * each js file in an array list may be defined as a simple file name ("script.js" or "script")
+			 * or can be defined as an associative array with the file name as key and an options array as
+			 * detailed options to be used for this item only.
+			 * 
+			 * array(
+			 *     'script1',
+			 *     'script2',
+			 *     'html5shiv' => array( 'if'=>'lt IE 9' ),
+			 *     'html5shiv' => 'lte IE 9' // "if" is the default option listen if a scalar value is given
+			 * )
+			 * 
+			 * for conditional expression documentation read this:
+			 * http://www.quirksmode.org/css/condcom.html
+			 * 
+			 */
+			foreach ($url as $i=>$opt) {
+				
+				// Default scalar value for associative declarations.
+				if ( !is_array($opt) && !is_numeric($i) ) $opt = array( 'if'=>$opt );
+				
+				// Css file only declarations.
+				if ( !is_array($opt) ) {
+					$i 		= $opt;
+					$opt 	= array();
+				}
+				
+				$out .= "\n\t" . $this->script($i, PowerSet::merge($options,$opt) );			
+			}
+			/** --CakePOWER-- **/
+			
 			if (empty($options['block'])) {
 				return $out . "\n";
 			}
@@ -259,6 +296,18 @@ class PowerHtmlHelper extends HtmlHelper {
 		$attributes = $this->_parseAttributes($options, array('block', 'once'), ' ');
 		
 		$out = sprintf($this->_tags['javascriptlink'], $url, $attributes);
+		
+		
+		/** @@CakePOWER@@ **/
+		/* apply conditional comment */
+		if ( !empty($options['if']) ) {
+			$out = '<!--[if ' . $options['if'] . ']>' . $out . '<![endif]-->';
+		}
+		
+		if ( !empty($options['debug']) ) {
+			$out = "\r\n" . $out;	
+		}
+		/** --CakePOWER-- **/
 
 		if (empty($options['block'])) {
 			return $out;
@@ -488,6 +537,7 @@ class PowerHtmlHelper extends HtmlHelper {
 	public function link($title, $url = null, $options = array(), $confirmMessage = false) {
 		
 		if ( strpos($title,'<img src') !== false ) $options += array( 'escape'=>false );
+		if ( strpos($title,'<span></span>') !== false ) $options += array( 'escape'=>false );
 		
 		return parent::link( $title, $url, $options, $confirmMessage );
 		

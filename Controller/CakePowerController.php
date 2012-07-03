@@ -66,6 +66,49 @@ class CakePowerController extends Controller {
 	
 	
 	
+	
+/**	
+ * Utilities to add libraries to the controller during the constructor method.
+ * Use these methods in your controller's __construct() method
+ */
+	
+	public function addLib( $type, $name, $config = array(), $override = true ) {
+		
+		if ( !empty($this->{$type}[$name]) && $override !== true ) return false;
+		
+		$this->{$type}[$name] = $config;
+		
+		return true;
+	
+	}
+	
+	public function addHelper( $name, $config = array(), $override = true ) {
+		
+		return $this->addLib( 'helpers', $name, $config, $override );
+		
+	}
+	
+	public function addComponent( $name, $config = array(), $override = true ) {
+		
+		return $this->addLib( 'components', $name, $config, $override );
+		
+	}
+	
+	public function addModel( $name, $config = array(), $override = true ) {
+		
+		return $this->addLib( 'models', $name, $config, $override );
+		
+	}
+	
+	public function addBehavior( $name, $config = array(), $override = true ) {
+		
+		return $this->addLib( 'behaviors', $name, $config, $override );
+		
+	}
+	
+	
+	
+	
 
 	
 	

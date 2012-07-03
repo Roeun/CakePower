@@ -164,9 +164,21 @@ class PowerMenu {
  *     'url'  => array( 'controller'=>'users' )
  * )); 
  * 
+ * // Multiple items call
+ * PowerMenu::appendTo( 'admin.sidebar', array(
+ *     'users' => array( 'show'=>'...', ... ),
+ *     'groups' => array( ... ),
+ * ));
+ * 
  */
 	
 	public static function appendTo( $dest, $itemName = '', $itemData = array() ) {
+		
+		// Allow to add multiple menu items passing as associative array.
+		if ( is_array($itemName) && PowerSet::is_assoc($itemName) ) {
+			foreach ( $itemName as $k=>$v ) PowerMenu::appendTo( $dest, $k, $v );
+			return;
+		}
 		
 		$itemData = self::_itemData( $itemName, $itemData );
 		
@@ -226,6 +238,12 @@ class PowerMenu {
 	
 	public static function after( $dest, $itemName = '', $itemData = array() ) {
 		
+		// Allow to add multiple menu items passing as associative array.
+		if ( is_array($itemName) && PowerSet::is_assoc($itemName) ) {
+			foreach ( $itemName as $k=>$v ) PowerMenu::after( $dest, $k, $v );
+			return;
+		}
+		
 		$itemData = self::_itemData( $itemName, $itemData );
 		
 		$fullPath = self::_fullPath( $dest );
@@ -251,6 +269,12 @@ class PowerMenu {
 	}
 	
 	public static function before( $dest, $itemName = '', $itemData = array() ) {
+		
+		// Allow to add multiple menu items passing as associative array.
+		if ( is_array($itemName) && PowerSet::is_assoc($itemName) ) {
+			foreach ( $itemName as $k=>$v ) PowerMenu::before( $dest, $k, $v );
+			return;
+		}
 		
 		$itemData = self::_itemData( $itemName, $itemData );
 		
