@@ -89,7 +89,7 @@ function resetAverageTime() {
 function powerSelfProtocol() {
 	
 	// these info are not available to SHELL!
-	if ( empty($_SERVER["HTTPS"]) || empty($_SERVER["SERVER_PROTOCOL"]) ) return;
+	if ( empty($_SERVER["HTTPS"]) && empty($_SERVER["SERVER_PROTOCOL"]) ) return;
 	
 	$s = empty($_SERVER["HTTPS"]) ? '' : ($_SERVER["HTTPS"] == "on") ? "s" : "";
 	 

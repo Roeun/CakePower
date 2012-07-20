@@ -11,7 +11,13 @@ App::import( 'View/Helper', 'HtmlHelper' );
 App::uses('Folder',		'Utility');
 App::uses('File',		'Utility');
 App::uses('Component',	'Controller');
-App::uses('lessc',		'CakePower.Vendor');
+
+// Thrd party libraries
+App::import( 'CakePower.Vendor/thrd', 'lessc' );
+App::import( 'CakePower.Vendor/thrd', 'cssmin' );
+
+
+
 
 // Less constants.
 if ( !defined('CACHE_LESS') ) 	define( 'CACHE_LESS', CACHE . 'less' . DS );
@@ -414,6 +420,22 @@ class PowerHtmlHelper extends HtmlHelper {
  */
 	public function div( $class, $text = null, $options = array()) {
 		
+		// Support for full-array configuration.
+		if ( is_array($class) ) {
+			
+			$options = $class;
+			$options+= array( 'class'=>'', 'content'=>'' );
+			
+			$class = $options['class'];
+			unset($options['class']);
+			
+			$text = $options['content'];
+			unset($options['content']);
+			
+			return $this->div( $class, $text, $options );
+		
+		}
+		
 		$options['class'] = $class;
 		
 		return $this->tag( 'div', $text, $options );
@@ -664,6 +686,7 @@ class PowerHtmlHelper extends HtmlHelper {
  */
 	protected function auto_compile_less($lessFilename, $cssFilename) {
 		
+		
 		// Check if cache & output folders are writable and the less file exists.
 		if (!is_writable(CACHE.'less')) {
 			trigger_error(__d('cake_dev', '"%s" directory is NOT writable.', CACHE.'less'), E_USER_NOTICE);
@@ -686,6 +709,11 @@ class PowerHtmlHelper extends HtmlHelper {
 		}
 
 		$new_cache = lessc::cexecute($cache);
+		
+		// Minify the css source!
+		// Minification occours only if  debug is turned to 0!
+		if ( class_exists('CssMin') && Configure::read('debug') === 0 ) $new_cache['compiled'] = CssMin::minify($new_cache['compiled']);
+		
 		if (!is_array($cache) || $new_cache['updated'] > $cache['updated'] || file_exists($cssFilename) === false) {
 			$cssFile = new File($cssFilename, true);
 			if ($cssFile->write($new_cache['compiled']) === false) {
