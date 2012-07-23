@@ -396,6 +396,17 @@ class PowerHtmlHelper extends HtmlHelper {
 			
 			foreach ( $_text as $item ) {
 				
+				// Apply default "tag()" method to internal configuration-only item.
+				// this allow to write something like:
+				// echo $this->Html->tag(array(
+				//     'name' => 'div',
+				//     'content' => array(
+				//          array( 'name'=>'p', 'content'=>'foo1' ),
+				//          array( 'name'=>'div', 'content'=>'foo2 )
+				//     )
+				//))
+				if ( is_array($item) && isset($item['name']) ) $item = $this->tag( $item );
+				
 				$text.= $item;
 			
 			}
