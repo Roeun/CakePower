@@ -152,6 +152,21 @@ class PowerConfig {
 		return $tmp;
 		
 	}
+
+	
+/**	
+ * Check a config key to be equal to a given value.
+ * Non existing keys have a "false" value.
+ */
+	public static function is( $key = null, $checkVal = null ) {
+		
+		$keyVal = PowerConfig::get( $key );
+		
+		return $keyVal == $checkVal;
+		
+	}
+	
+	
 	
 	
 /**

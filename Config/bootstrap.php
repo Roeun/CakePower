@@ -22,6 +22,7 @@ define( 'POWER_START', microtime() );
 // Utilities
 App::import( 'Vendor', 'CakePower.Basics' );
 App::import( 'Vendor', 'CakePower.Ua' );
+App::import( 'Vendor', 'CakePower.Uth' );
 App::import( 'Vendor', 'CakePower.PowerSet' );
 App::import( 'Vendor', 'CakePower.PowerString' );
 App::import( 'Vendor', 'CakePower.PowerConfig' );
@@ -78,6 +79,10 @@ PowerConfig::set(array(
 			'search'	=> powerSelfSearch()
 			
 		),
+		
+		// Controller's request params placeholder.
+		// It is filled up in the CakePowerController::__construct method.
+		'params' => array(),
 		
 		// Cliente recognition library
 		'ua' => ua()

@@ -55,6 +55,10 @@ class CakePowerController extends Controller {
 		parent::__construct( $request, $response );
 		
 		
+		
+		// Set request params to the global access configuration to allow an easy access.
+		PowerConfig::set( 'request.params', $this->request->params );
+		
 		// TMP: here will be listed controller's services...
 		foreach ( $this->methods as $i=>$val ) {
 			if ( substr($val,0,2) == '__' ) $this->methods[$i] = substr($val,2,100);
