@@ -388,6 +388,29 @@ class PowerHtmlHelper extends HtmlHelper {
 			
 		} 
 		
+		
+		// Default handled options
+		$options+= array( 'if'=>true, 'else'=>'', 'allowEmpty'=>'span,td,th,i,b' );
+		
+		
+		// Handle conditional output and conditional content.
+		// the "else" key will replace the content with "else" value.
+		// if no "else" key is provided no output is sent back to the client!
+		if ( !$options['if'] ) {
+			if ( !empty($options['else']) ) {
+				$text = $options['else'];
+				
+			} else {
+				return;
+				
+			}	
+		}
+		unset($options['if']);
+		unset($options['else']);
+		
+		
+		
+		// Compose the tag content form an array value.
 		if ( is_array($text) ) {
 			
 			$_text = $text;
@@ -412,6 +435,17 @@ class PowerHtmlHelper extends HtmlHelper {
 			}
 			
 		}
+		
+		
+		
+		// Handle the tag based "allowEmpty" and translates to true/false
+		if ( is_string($options['allowEmpty']) && strpos($options['allowEmpty'],$name) !== false ) $options['allowEmpty'] = true; else $options['allowEmpty'] = false;
+		
+		// Handle the "allowEmpty" option [true/false]
+		if ( $options['allowEmpty'] === false && empty($text) ) return;
+		unset($options['allowEmpty']);
+		
+		
 		
 		// Prevent blank attributes to be appended to the HTML
 		if ( empty($options['class']) ) 		unset($options['class']);
