@@ -12,11 +12,10 @@ App::uses('Folder',		'Utility');
 App::uses('File',		'Utility');
 App::uses('Component',	'Controller');
 
+
 // Thrd party libraries
-App::import( 'CakePower.Vendor/thrd', 'lessc' );
-App::import( 'CakePower.Vendor/thrd', 'cssmin' );
-
-
+App::import( 'Vendor', 'CakePower.thrd/lessc' );
+App::import( 'Vendor', 'CakePower.thrd/cssmin' );
 
 
 // Less constants.
@@ -392,7 +391,6 @@ class PowerHtmlHelper extends HtmlHelper {
 		// Default handled options
 		$options+= array( 'if'=>true, 'else'=>'', 'allowEmpty'=>'span,td,th,i,b' );
 		
-		
 		// Handle conditional output and conditional content.
 		// the "else" key will replace the content with "else" value.
 		// if no "else" key is provided no output is sent back to the client!
@@ -439,7 +437,7 @@ class PowerHtmlHelper extends HtmlHelper {
 		
 		
 		// Handle the tag based "allowEmpty" and translates to true/false
-		if ( is_string($options['allowEmpty']) && strpos($options['allowEmpty'],$name) !== false ) $options['allowEmpty'] = true; else $options['allowEmpty'] = false;
+		if ( is_string($options['allowEmpty']) ) if ( strpos($options['allowEmpty'],$name) !== false ) $options['allowEmpty'] = true; else $options['allowEmpty'] = false;
 		
 		// Handle the "allowEmpty" option [true/false]
 		if ( $options['allowEmpty'] === false && empty($text) ) return;
