@@ -232,7 +232,7 @@ class PowerConfig {
 		if ( !empty($key) && !self::exists($key) ) return self::set( $key, $val );
 		
 		// Use PowerSet::pushDiff() to merge data
-		return PowerConfig::set( $key, Set::pushDiff(PowerConfig::get($key),$val) );
+		return PowerConfig::set( $key, PowerSet::pushDiff(PowerConfig::get($key),$val) );
 		
 	}
 	

@@ -32,330 +32,130 @@ class PowerSessionComponent extends SessionComponent {
 	
 	
 	
-/**
- * Shortcuts to the PowerSession flashing methods
- * These methods handle AJAX automagically.
+###################################################################################################
+### STANDARD HTTP PAGE REFRESH NOTIFICATION UTILITIES                                           ###
+###################################################################################################
+	
+/**	
+ * These methods helps by setting a flash message and redirect to a destination in a single instruction.
+ * Each method name define a "type of notification" and the front-end is asked to handle this
+ * type by setting up a custom element when rendering the flash message.
  * 
- * If a request is sent throught ajax then the response will be a JSON
- * object created with "ajaxOk", "ajaxKo", "ajaxMsg" methods.
+ * $redirect contains a destination url booth in string or array format.
+ * redirect works only for non-empty and non-false values!
  * 
- * ->ok( 'success' );
- * sets up the session notifications or handle ajax object response
- * 
- * ->ok( 'success', array( 'ajax'=>false ));
- * force to skyp ajax check
- * 
- * ->ok( 'success', array( 'redirect'=>array() ));
- * redirects only if not ajax.
- * if ajax skip the redirect property
- * [normally used when editing existing records]
- * 
- * ->ok( 'success', array( 'redirect'=>array(...), 'ajaxRedirect'=>true ));
- * sets up the session notification and redirect.
- * if ajax, sends the json object with a Router::url() parsed "redirect" property.
- * javascript must handle this property to redirect.
- * [normally used when creating new records]
- * 
+ * $options contains params to be given to the element.
+ * CakePanel plugin can handle a "title" option for the message!
+ * if you pass a string as 3rd param it will be assigned as option[title]
  */
 	
-	public function msg( $str, $options = array() ) { 
+	public function flashOk( $str, $redirect = array(), $options = array() ) {
 		
-		$ajax_check 	= true;
-		$ajax_options	= array();
-		$ajax_redirect	= false;
-		$redirect		= false;
+		if ( is_string($options) ) $options = array( 'title'=>$options );
 		
-		if ( isset($options['redirect']) ) $redirect = $options['redirect'];
-		unset($options['redirect']);
-		
-		if ( isset($options['ajax']) ) $ajax_check = $options['ajax'];
-		unset($options['ajax']);
-		
-		if ( isset($options['ajaxRedirect']) ) $ajax_redirect = $options['ajaxRedirect'];
-		unset($options['ajaxRedirect']);
-		
-		// Sets up AJAX based response.
-		if ( $ajax_check ) {
-			if ( $ajax_redirect ) $ajax_options = array_merge($options,array( 'redirect'=>$redirect ));
-			$this->ajaxMsg( $str, $ajax_options );	
-		}
-		
-		// Sets up session and internal redirect.
-		//$this->Session->msg( $str, $options );
-		$this->setFlash( $str );
-		if ( $redirect ) $this->Controller->redirect( $redirect );
-	
-	}
-	
-	public function alrt( $str, $options = array() ) { 
-		
-		$ajax_check 	= true;
-		$ajax_options	= array();
-		$ajax_redirect	= false;
-		$redirect		= false;
-		
-		if ( isset($options['redirect']) ) $redirect = $options['redirect'];
-		unset($options['redirect']);
-		
-		if ( isset($options['ajax']) ) $ajax_check = $options['ajax'];
-		unset($options['ajax']);
-		
-		if ( isset($options['ajaxRedirect']) ) $ajax_redirect = $options['ajaxRedirect'];
-		unset($options['ajaxRedirect']);
-		
-		// Sets up AJAX based response.
-		if ( $ajax_check ) {
-			if ( $ajax_redirect ) $ajax_options = array_merge($options,array( 'redirect'=>$redirect ));
-			$this->ajaxAlrt( $str, $ajax_options );	
-		}
-		
-		// Sets up session and internal redirect.
-		//$this->Session->msg( $str, $options );
-		$this->setFlash( $str, 'default', $options, 'alert' );
-		if ( $redirect ) $this->Controller->redirect( $redirect );
-	
-	}
-	
-	public function ok( $str, $options = array() ) {
-		
-		$ajax_check 	= true;
-		$ajax_options	= array();
-		$ajax_redirect	= false;
-		$redirect		= false;
-		
-		if ( isset($options['redirect']) ) $redirect = $options['redirect'];
-		unset($options['redirect']);
-		
-		if ( isset($options['ajax']) ) $ajax_check = $options['ajax'];
-		unset($options['ajax']);
-		
-		if ( isset($options['ajaxRedirect']) ) $ajax_redirect = $options['ajaxRedirect'];
-		unset($options['ajaxRedirect']);
-		
-		// Sets up AJAX based response.
-		if ( $ajax_check ) {
-			if ( $ajax_redirect ) $ajax_options = array_merge($options,array( 'redirect'=>$redirect ));
-			$this->ajaxOk( $str, $ajax_options );	
-		}
-		
-		// Sets up session and internal redirect.
-		//$this->Session->ok( $str, $options );
 		$this->setFlash( $str, 'default', $options, 'ok' );
 		if ( $redirect ) $this->Controller->redirect( $redirect );
 		 
 	}
 	
-	public function ko( $str, $options = array() ) {
+	public function flashKo( $str, $redirect = array(), $options = array() ) {
 		
-		$ajax_check 	= true;
-		$ajax_options	= array();
-		$ajax_redirect	= false;
-		$redirect		= false;
+		if ( is_string($options) ) $options = array( 'title'=>$options );
 		
-		if ( is_string($options) ) {
-			$tmp = array( 'title'=>$str );
-			$str = $options;
-			$options = $tmp; 
-		}
-		
-		if ( isset($options['redirect']) ) $redirect = $options['redirect'];
-		unset($options['redirect']);
-		
-		if ( isset($options['ajax']) ) $ajax_check = $options['ajax'];
-		unset($options['ajax']);
-		
-		if ( isset($options['ajaxRedirect']) ) $ajax_redirect = $options['ajaxRedirect'];
-		unset($options['ajaxRedirect']);
-		
-		// Sets up AJAX based response.
-		if ( $ajax_check ) {
-			if ( $ajax_redirect ) $ajax_options = array_merge($options,array( 'redirect'=>$redirect ));
-			$this->ajaxKo( $str, $ajax_options );	
-		}
-		
-		// Sets up session and internal redirect.
-		//$this->Session->ko( $str, $options );
 		$this->setFlash( $str, 'default', $options, 'ko' );
 		if ( $redirect ) $this->Controller->redirect( $redirect );
+		
 	}
+	
+	public function flashAlert( $str, $redirect = array(), $options = array() ) {
+
+		if ( is_string($options) ) $options = array( 'title'=>$options );
+		
+		$this->setFlash( $str, 'default', $options, 'alert' );
+		if ( $redirect ) $this->Controller->redirect( $redirect );
+	
+	}
+	
+	public function flashMsg( $str, $redirect = array(), $options = array() ) {
+
+		if ( is_string($options) ) $options = array( 'title'=>$options );
+		
+		$this->setFlash( $str );
+		if ( $redirect ) $this->Controller->redirect( $redirect );
+	
+	}
+	
+	
+
+	
+
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	
 	
 	
 
+###################################################################################################
+### AJAX NOTIFICATION UTILITIES                                                                 ###
+###################################################################################################
+
 	
-	
-/**
- * Ajax Related Notifications
+/**	
+ * Pack all validation errors into one object to be sent via JSON.
+ * This object contains 2 sub-objects: "models" and "fields"
  * 
- * intercept an ajax callback and send to the client a json object with
- * a status information, a message and even some custom data
+ * models: will contain errors with a CakePHP model/errors[] notation.
+ * fields: will contain an array of fieldID generated with a standard CakePHP naming rule.
+ *         each field will contain error description
  */
-	
-	public function ajaxMsg( $message, $options = array() ) {
-		
-		if ( !$this->Controller->request->is('ajax') ) return;
-		
-		$data = array( 'status'=>'msg', 'message'=>$message, 'data'=>$options, 'CakePower'=>'1.0' );
-		
-		// Adds controller's validation errors to the data response.
-		if ( empty($options['validationErrors']) ) {
-			$options['validationErrors'] = $this->ajaxErrors();
-		}
-		
-		// Export validation errors to the data array.
-		if ( isset($options['validationErrors']) ) {
-			$data['validationErrors'] = $options['validationErrors'];
-			unset($options['validationErrors']);
-			$data['options'] = $options;
-		}
-		
-		// Export redirect informations to the data array
-		if ( isset($options['redirect']) ) {
-			if ( $options['redirect'] ) $data['redirect'] = Router::url($options['redirect']);
-			unset($options['redirect']);
-			$data['data'] = $options;
-		}
-		
-		echo json_encode($data);
-		exit;
-	
-	}
-	
-	public function ajaxAlrt( $message, $options = array() ) {
-		
-		if ( !$this->Controller->request->is('ajax') ) return;
-		
-		$data = array( 'status'=>'alert', 'message'=>$message, 'data'=>$options, 'CakePower'=>'1.0' );
-		
-		// Adds controller's validation errors to the data response.
-		if ( empty($options['validationErrors']) ) {
-			$options['validationErrors'] = $this->ajaxErrors();
-		}
-		
-		// Export validation errors to the data array.
-		if ( isset($options['validationErrors']) ) {
-			$data['validationErrors'] = $options['validationErrors'];
-			unset($options['validationErrors']);
-			$data['options'] = $options;
-		}
-		
-		// Export redirect informations to the data array
-		if ( isset($options['redirect']) ) {
-			if ( $options['redirect'] ) $data['redirect'] = Router::url($options['redirect']);
-			unset($options['redirect']);
-			$data['data'] = $options;
-		}
-		
-		echo json_encode($data);
-		exit;
-	
-	}
-	
-	public function ajaxOk( $message, $options = array() ) {
-		
-		if ( !$this->Controller->request->is('ajax') ) return;
-		
-		$data = array( 'status'=>'ok', 'message'=>$message, 'data'=>$options, 'CakePower'=>'1.0' );
-		
-		// Adds controller's validation errors to the data response.
-		if ( empty($options['validationErrors']) ) {
-			$options['validationErrors'] = $this->ajaxErrors();
-		}
-		
-		// Export validation errors to the data array.
-		if ( isset($options['validationErrors']) ) {
-			$data['validationErrors'] = $options['validationErrors'];
-			unset($options['validationErrors']);
-			$data['options'] = $options;
-		}
-		
-		// Export redirect informations to the data array
-		if ( isset($options['redirect']) ) {
-			if ( $options['redirect'] ) $data['redirect'] = Router::url($options['redirect']);
-			unset($options['redirect']);
-			$data['data'] = $options;
-		}
-		
-		echo json_encode($data);
-		exit;
-	
-	}
-	
-	public function ajaxKo( $message, $options = array() ) {
-		
-		if ( !$this->Controller->request->is('ajax') ) return;
-		
-		$data = array( 'status'=>'ko', 'message'=>$message, 'data'=>$options, 'CakePower'=>'1.0' );
-		
-		// Adds controller's validation errors to the data response.
-		if ( empty($options['validationErrors']) ) {
-			$options['validationErrors'] = $this->ajaxErrors();
-		}
-		
-		// Export validation errors to the data array.
-		if ( isset($options['validationErrors']) ) {
-			$data['validationErrors'] = $options['validationErrors'];
-			unset($options['validationErrors']);
-			$data['options'] = $options;
-		}
-		
-		// Export redirect informations to the data array
-		if ( isset($options['redirect']) ) {
-			if ( $options['redirect'] ) $data['redirect'] = Router::url($options['redirect']);
-			unset($options['redirect']);
-			$data['data'] = $options;
-		}
-		
-		
-		echo json_encode($data);
-		exit;
-	
-	}
-	
 	public function ajaxErrors() {
 		
 		$errors = array( 'models'=>array(), 'fields'=>array() );
 		
 		foreach ( $this->Controller->uses as $modelName ) {
 			
-			// Handle models from plugins with dotted notation.
+			// handle models from plugins with dotted notation.
 			if ( strpos($modelName,'.') !== false ) list( $plugin, $modelName ) = explode('.',$modelName);
 			
+			// skip a model with no errors.
+			if ( empty($this->Controller->{$modelName}->validationErrors) ) continue;
+			
+			// add model's errors info to an object
 			$errors['models'][$modelName] = $this->Controller->{$modelName}->validationErrors;
 			
+			// Calculate each error's field ID. Fastest client usage!
 			foreach ( $this->Controller->{$modelName}->validationErrors as $fieldName=>$msgs ) {
 				
 				$errors['fields'][$modelName.Inflector::camelize($fieldName)] = $msgs[0];
 				
 			}
+			
 		}
 
 		return $errors;
 		
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
 /**	
- * Shortcuts with message and redirect url.
- * They listen to the REST method to activate or deactivate the AJAX REDIRECT option!
+ * AJAX redirect is allowed only in POST and DELETE mode!
+ * Client side form may fore a redirect requset by create a "_redirect" true value in _POST or _GET data.
  */
 	
-	protected function ajaxRestRedirect( $redirect ) {
+	protected function ajaxRedirect( $redirect ) {
 		
 		$_redirect = ( $this->Controller->request->is('POST') || $this->Controller->request->is('DELETE') ) ? true : false;
 		if ( isset($_GET['_redirect']) ) 	$_redirect = ( $_GET['_redirect'] );
 		if ( isset($_POST['_redirect']) ) 	$_redirect = ( $_POST['_redirect'] );
 		
-		return $_redirect;
+		// if redirect is allowed by the action it returns the redirect info.
+		if ( $_redirect ) return $redirect;
 		
 	}
 	
@@ -366,39 +166,318 @@ class PowerSessionComponent extends SessionComponent {
 		
 	}
 	
-	public function confirm( $str, $redirect = array() ) {
+	
+/**
+ * Ajax Related Notifications
+ * 
+ * intercept an ajax callback and send to the client a json object with
+ * a status information, a message and even some custom data
+ */
+	
+	
+	public function ajaxResponse( $status, $message, $options = array() ) {
 		
-		$this->ok( $str, array(
-			'redirect' 		=> $redirect,
-			'ajaxRedirect' 	=> $this->ajaxRestRedirect($redirect)
-		));
+		if ( !$this->Controller->request->is('ajax') ) return;
+		
+		$data = array(
+			
+			'CakePower'			=> '1.0',
+			'type'				=> 'ajax',
+			'status'			=> $status, 
+			'message'			=> $message,
+
+			'redirect'			=> '',
+			
+			'validationErrors'	=> array(),
+			'requestData'		=> array(),
+			
+		);
+		
+		// Adds controller's validation errors to the data response.
+		// you can set "validationErrors = false" in the options to prevent this behavior!
+		if ( !isset($options['validationErrors']) ) $options['validationErrors'] = $this->ajaxErrors();
+		if ( $options['validationErrors'] === false ) $options['validationErrors'] = array();
+		$data['validationErrors'] = $options['validationErrors'];
+		unset($options['validationErrors']);
+		
+		// Adds controller's request data to the data response.
+		// you can set "requestData = false" in the options to prevent this behavior!
+		if ( !isset($options['requestData']) || $options['requestData'] === true ) $options['requestData'] = $this->Controller->request->data;
+		if ( $options['requestData'] === false ) $options['requestData'] = array();
+		$data['requestData'] = $options['requestData'];
+		unset($options['requestData']);
+		
+		
+		// Export redirect informations to the data array
+		if ( isset($options['redirect']) ) {
+			if ( !empty($options['redirect']) && is_array($options['redirect']) ) $options['redirect'] = Router::url($options['redirect']);
+			$data['redirect'] = $options['redirect'];
+			unset($options['redirect']);
+		}
+		
+		// Setup the JSON response with request details and provided data.
+		$json = array( '_response'=>$data );
+		$json = PowerSet::merge( $json, $options );
+		
+		echo json_encode($json);
+		exit;
 		
 	}
 	
-	public function error( $str, $redirect = array() ) {
+	
+	public function ajaxMsg( $message, $options = array() ) {
 		
-		$this->ko( $str, array(
-			'redirect' 		=> $redirect,
-			'ajaxRedirect' 	=> $this->ajaxRestRedirect($redirect)
-		));
+		$this->ajaxResponse( 'msg', $message, $options );
 		
 	}
 	
-	public function alert( $str, $redirect = array() ) {
+	public function ajaxAlert( $message, $options = array() ) {
 		
-		$this->alrt( $str, array(
-			'redirect' 		=> $redirect,
-			'ajaxRedirect' 	=> $this->ajaxRestRedirect($redirect)
-		));
+		$this->ajaxResponse( 'alert', $message, $options );
 		
 	}
 	
-	public function message( $str, $redirect = array() ) {
+	public function ajaxOk( $message, $options = array() ) {
 		
-		$this->msg( $str, array(
-			'redirect' 		=> $redirect,
-			'ajaxRedirect' 	=> $this->ajaxRestRedirect($redirect)
-		));
+		$this->ajaxResponse( 'ok', $message, $options );
+	
+	}
+	
+	public function ajaxKo( $message, $options = array() ) {
+		
+		$this->ajaxResponse( 'ko', $message, $options );
+		
+	}
+	
+	
+	
+	
+	
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+###################################################################################################
+### REST NOTIFICATION UTILITIES                                                                 ###
+###################################################################################################
+	
+	// Creates the serialization
+	protected function _rest_serialize( $options ) {
+	
+		$_serialize = array();
+		
+		foreach ( $options as $key=>$val ) {
+			
+			if ( is_numeric($key) ) {
+				$key = $val;
+				
+			} else {
+				$this->Controller->set( $key, $val );
+				
+			}
+			
+			$_serialize[] = $key;
+		
+		}
+		
+		return $_serialize;
+		
+	}
+	
+	public function restResponse( $msg, $message, $options = array() ) {
+		
+		if ( !$this->Controller->request->is('rest') ) return;
+		
+		// "_response" data structure.
+		$data = array(
+			'CakePower'			=> '1.0',
+			'type'				=> 'rest',
+			'status'			=> $msg, 
+			'message'			=> $message,
+			 
+			'validationErrors'	=> array(),
+			'requestData'		=> array(),
+			
+			// rest specific data
+			'_serialize'		=> array()
+			
+		);
+		
+		
+		// Adds controller's validation errors to the data response.
+		if ( empty($options['validationErrors']) ) {
+			$data['validationErrors'] = $this->ajaxErrors();
+			$data['validationErrors'] = $data['validationErrors']['models'];
+		}
+		
+		// Adds controller's request data to the data response.
+		// you can set "requestData = false" in the options to prevent this behavior! 
+		if ( !isset($options['requestData']) || $options['requestData'] === true ) $options['requestData'] = $this->Controller->request->data;
+		if ( $options['requestData'] === false ) $options['requestData'] = array();
+		$data['requestData'] = $options['requestData'];
+		unset($options['requestData']);
+		
+		
+		$data['_serialize'] = $this->_rest_serialize($options);
+		
+		$this->Controller->set( '_response', 	$data );
+		$this->Controller->set( '_serialize', 	PowerSet::merge(array('_response'),$data['_serialize']) );
+		
+		$this->Controller->render();
+		
+		return true;
+	
+	}
+	
+	public function restOk( $message, $options = array() ) {
+		
+		return $this->restResponse( 'ok', $message, $options );
+		
+	}
+	
+	public function restKo( $message, $options = array() ) {
+		
+		return $this->restResponse( 'ko', $message, $options );
+		
+	}
+	
+	public function restAlert( $message, $options = array() ) {
+		
+		return $this->restResponse( 'alert', $message, $options );
+		
+	}
+	
+	public function restMsg( $message, $options = array() ) {
+		
+		return $this->restResponse( 'msg', $message, $options );
+		
+	}
+	
+	
+	
+	
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+###################################################################################################
+### HIGH LEVEL NOTIFICATION UTILITIES                                                           ###
+###################################################################################################
+	
+	public function confirm( $str, $redirect = array(), $options = array() ) {
+		
+		// Ajax
+		$ajaxOptions = PowerSet::merge(array(
+			'redirect' 		=> $this->ajaxRedirect($redirect),
+			'requestData' 	=> false
+		),$options);
+		
+		$this->ajaxOk( $str, $ajaxOptions );
+		
+		
+		// Rest
+		$restOptions = PowerSet::merge(array(
+			'requestData' 	=> false
+		),$options);
+		
+		if ( $this->restOk( $str, $restOptions ) ) return;
+		
+		
+		// Http
+		$this->flashOk( $str, $redirect );
+		
+	}
+	
+	public function error( $str, $redirect = array(), $options = array() ) {
+		
+		// Ajax
+		$ajaxOptions = PowerSet::merge(array(
+			'redirect' 		=> $this->ajaxRedirect($redirect),
+			'requestData' 	=> false
+		),$options);
+		
+		
+		$this->ajaxKo( $str, $ajaxOptions );
+		
+		
+		// Rest
+		$restOptions = PowerSet::merge(array(
+			'requestData' 	=> false
+		),$options);
+		
+		if ( $this->restKo( $str, $restOptions ) ) return;
+		
+		
+		// Http
+		$this->flashKo( $str, $redirect );
+		
+	}
+	
+	public function alert( $str, $redirect = array(), $options = array() ) {
+		
+		// Ajax
+		$ajaxOptions = PowerSet::merge(array(
+			'redirect' 		=> $this->ajaxRedirect($redirect),
+			'requestData' 	=> false
+		),$options);
+		
+		$this->ajaxAlert( $str, $ajaxOptions );
+		
+		
+		// Rest
+		$restOptions = PowerSet::merge(array(
+			'requestData' 	=> false
+		),$options);
+		
+		if ( $this->restAlert( $str, $restOptions ) ) return;
+		
+		
+		// Http
+		$this->flashAlert( $str, $redirect );
+		
+	}
+	
+	public function message( $str, $redirect = array(), $options = array() ) {
+		
+		// Ajax
+		$ajaxOptions = PowerSet::merge(array(
+			'redirect' 		=> $this->ajaxRedirect($redirect),
+			'requestData' 	=> false
+		),$options);
+		
+		$this->ajaxMsg( $str, $ajaxOptions );
+		
+		
+		// Rest
+		$restOptions = PowerSet::merge(array(
+			'requestData' 	=> false
+		),$options);
+		
+		if ( $this->restMsg( $str, $restOptions ) ) return;
+		
+		
+		// Http
+		$this->flashMsg( $str, $redirect );
 		
 	}
 	

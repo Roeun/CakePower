@@ -7,6 +7,8 @@
  
 App::uses('Controller', 'Controller');
 
+
+
 class CakePowerController extends Controller {
 	
 
@@ -20,7 +22,7 @@ class CakePowerController extends Controller {
 	protected $__cakePower = array(
 		'version' 			=> '1.0',
 		'components' 		=> array( 'Session', 'Auth'=>false ),
-		'helpers' 			=> array( 'Html', 'Paginator' ),
+		'helpers' 			=> array( 'Html', 'Session', 'Paginator' ),
 	);
 	
 	
@@ -52,8 +54,14 @@ class CakePowerController extends Controller {
 			
 		}
 		
-		parent::__construct( $request, $response );
+		// Add a is('rest') detector to the request object.
+		// detecting a REST request is responsibility of the PowerApp class!
+		$request->addDetector( 'rest', array(
+			'callback' => array( 'PowerApp', 'is_rest_request' )
+		));
 		
+		
+		parent::__construct( $request, $response );
 		
 		
 		// Set request params to the global access configuration to allow an easy access.
@@ -113,6 +121,35 @@ class CakePowerController extends Controller {
 	
 	
 	
+	
+	
+	
+	
+	
+/**	
+ * tell() replace set() adding implicit support for ajax/rest requests.
+ * 
+ * it handle the same input required by set()
+ */
+	public function tell( $key, $val = null, $msg = null ) {
+		
+		// rest/ajax message as 2nd parameter
+		if ( is_array($key) && !empty($val) ) $msg = $val;
+		
+		// handle simple key/value esportation translating to an array
+		if ( !is_array($key) ) $key = array( $key=>$val );
+		
+		// apply a default message
+		if ( empty($msg) ) $msg = 'export';
+		
+		// Export REST and AJAX data
+		if ( $this->Session->restOk( $msg, $key )) return;
+		$this->Session->ajaxOk( $msg, $key );
+		
+		// Export data to the view
+		$this->set($key);
+	
+	}
 
 	
 	

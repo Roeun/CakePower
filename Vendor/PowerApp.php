@@ -308,5 +308,26 @@ class PowerApp {
 	
 	}
 	
+	
+	
+	
+	
+	
+/**	
+ * Tryies to intercept a REST action...
+ * i'm not sure about this code... it is used by Request::addDetector
+ */
+	public static function is_rest_request() {
+		
+		// Test if the controller is a REST mapped resource.
+		if ( !in_array( PowerConfig::get('request.params.controller'), Router::mapResources(array()) ) ) return false;
+		
+		// A request with no extension set often rapresent a standard CakePHP request!
+		if ( !PowerConfig::exists('request.params.ext') ) return false;
+		
+		return true;
+	
+	}
+	
 
 }
