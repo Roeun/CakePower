@@ -219,6 +219,8 @@ class PowerSessionComponent extends SessionComponent {
 		$json = array( '_response'=>$data );
 		$json = PowerSet::merge( $json, $options );
 		
+		if ( !empty($options['status']) ) header('HTTP/1.0 ' . $options['status'] . ' ' . $message, true, 500);
+		
 		echo json_encode($json);
 		exit;
 		
@@ -244,6 +246,8 @@ class PowerSessionComponent extends SessionComponent {
 	}
 	
 	public function ajaxKo( $message, $options = array() ) {
+		
+		$options+= array( 'status'=>500 );
 		
 		$this->ajaxResponse( 'ko', $message, $options );
 		
@@ -330,6 +334,8 @@ class PowerSessionComponent extends SessionComponent {
 		$this->Controller->set( '_response', 	$data );
 		$this->Controller->set( '_serialize', 	PowerSet::merge(array('_response'),$data['_serialize']) );
 		
+		if ( !empty($options['status']) ) header('HTTP/1.0 ' . $options['status'] . ' ' . $message, true, 500);
+		
 		$this->Controller->render();
 		
 		return true;
@@ -343,6 +349,8 @@ class PowerSessionComponent extends SessionComponent {
 	}
 	
 	public function restKo( $message, $options = array() ) {
+		
+		$options+= array( 'status'=>500 );
 		
 		return $this->restResponse( 'ko', $message, $options );
 		
@@ -415,7 +423,6 @@ class PowerSessionComponent extends SessionComponent {
 			'redirect' 		=> $this->ajaxRedirect($redirect),
 			'requestData' 	=> false
 		),$options);
-		
 		
 		$this->ajaxKo( $str, $ajaxOptions );
 		

@@ -366,7 +366,7 @@ class PowerHtmlHelper extends HtmlHelper {
  * @param unknown_type $text
  * @param unknown_type $options
  */	
-	public function tag( $name, $text = null, $options = array()) {
+	public function tag( $name='div', $text = null, $options = array()) {
 		
 		// Full array configuration.
 		// allow to set up every option in a single array.
@@ -411,6 +411,18 @@ class PowerHtmlHelper extends HtmlHelper {
 		// Compose the tag content form an array value.
 		if ( is_array($text) ) {
 			
+			// Allow to direct chain multiple arrays:
+			// array(
+			//   'name' => 'li',
+			//   'content' => array(
+			//      'name' => 'a',
+			//      'content' => 'test'
+			//   )
+			// )
+			//
+			// it translates a direct array content to a row of array contents as expected by the rest of the procedure.
+			if ( isset($text['content']) || isset($text['name']) || isset($text['class']) || isset($text['id']) ) $text = array( $text );
+			
 			$_text = $text;
 			
 			$text = '';
@@ -426,7 +438,7 @@ class PowerHtmlHelper extends HtmlHelper {
 				//          array( 'name'=>'div', 'content'=>'foo2 )
 				//     )
 				//))
-				if ( is_array($item) && isset($item['name']) ) $item = $this->tag( $item );
+				if ( is_array($item) ) $item = $this->tag( $item );
 				
 				$text.= $item;
 			
