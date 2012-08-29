@@ -247,7 +247,7 @@ class PowerSessionComponent extends SessionComponent {
 	
 	public function ajaxKo( $message, $options = array() ) {
 		
-		$options+= array( 'status'=>500 );
+		$options+= array( 'status'=>404 );
 		
 		$this->ajaxResponse( 'ko', $message, $options );
 		
@@ -350,7 +350,7 @@ class PowerSessionComponent extends SessionComponent {
 	
 	public function restKo( $message, $options = array() ) {
 		
-		$options+= array( 'status'=>500 );
+		$options+= array( 'status'=>404 );
 		
 		return $this->restResponse( 'ko', $message, $options );
 		
