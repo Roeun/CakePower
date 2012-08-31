@@ -389,6 +389,7 @@ class PowerHtmlHelper extends HtmlHelper {
 		
 		
 		// Default handled options
+		if ( !is_array($options) ) $options = array();
 		$options+= array( 'if'=>true, 'else'=>'', 'allowEmpty'=>'span,td,th,i,b' );
 		
 		// Handle conditional output and conditional content.
@@ -613,8 +614,11 @@ class PowerHtmlHelper extends HtmlHelper {
  */
 	public function link($title, $url = null, $options = array(), $confirmMessage = false) {
 		
-		if ( strpos($title,'<img src') !== false ) $options += array( 'escape'=>false );
-		if ( strpos($title,'<span></span>') !== false ) $options += array( 'escape'=>false );
+		if ( strpos($title,'<img src') 		!== false ) $options += array( 'escape'=>false );
+		if ( strpos($title,'<span') 		!== false ) $options += array( 'escape'=>false );
+		if ( strpos($title,'<strong') 		!== false ) $options += array( 'escape'=>false );
+		if ( strpos($title,'<em') 			!== false ) $options += array( 'escape'=>false );
+		if ( strpos($title,'<br') 			!== false ) $options += array( 'escape'=>false );
 		
 		return parent::link( $title, $url, $options, $confirmMessage );
 		

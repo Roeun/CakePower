@@ -29,10 +29,23 @@ class PowerSessionHelper extends SessionHelper {
 	
 	public function flash( $key=null, $attrs=array() ) {
 		
+		// shortcuts to flashes
+		if ( $key === ALL ) 	return $this->flashes( null, $attrs );
+		if ( is_array($key) ) 	return $this->flashes( $key, $attrs );
+		
+		// Parse the "key" param from the name of the element to render as flash message template
+		if ( !empty($attrs['element']) ) {
+			
+			$attrs['element'] = PowerString::tpl( $attrs['element'], array(
+				'key' 	=> $key
+			));
+			
+		}
+		
 		// Standard key based flash message
 		if ( !empty($key) && is_string($key) ) return parent::flash( $key, $attrs );
 		
-		// Multiple flash messages
+		// Multiple flash messages ( $key = null )
 		return $this->flashes( $key, $attrs );
 	
 	}

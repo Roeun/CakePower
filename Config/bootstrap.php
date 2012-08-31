@@ -10,6 +10,13 @@
 // Used to calculate execution time.
 define( 'POWER_START', microtime() );
 
+define( 'TRUE', 	true );
+define( 'FALSE', 	false );
+define( 'ALL', 		true );
+define( 'NONE', 	false );
+define( 'ON', 		true );
+define( 'OFF', 		false );
+
 
 
 /**
