@@ -22,7 +22,7 @@ class CakePowerController extends Controller {
 	protected $__cakePower = array(
 		'version' 			=> '1.0',
 		'components' 		=> array( 'Session', 'Auth'=>false ),
-		'helpers' 			=> array( 'Html', 'Session', 'Paginator' ),
+		'helpers' 			=> array( 'Html', 'Session', 'Paginator', 'Form' ),
 	);
 	
 	
@@ -33,6 +33,8 @@ class CakePowerController extends Controller {
  */
 	public function __construct($request = null, $response = null) {
 		
+		// Automagically loads CakePower's Auth Component Layer
+		if ( isset($this->components['Auth']) ) $this->__cakePower['components']['Auth'] = true;
 		
 		// Loads extended core classes setting an alias to use them with the normal app names.
 		foreach( array('components','helpers') as $type ) {
@@ -43,7 +45,7 @@ class CakePowerController extends Controller {
 					$cmp 	= $val;
 					$load 	= true;
 				} else {
-					$tmp 	= $key;
+					$cmp 	= $key;
 					$load 	= $val;
 				}
 				

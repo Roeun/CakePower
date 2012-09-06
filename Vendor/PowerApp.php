@@ -279,8 +279,56 @@ class PowerApp {
 	
 	
 	
+
 	
 	
+	
+/**	
+ * Loads an EventListner Class into the CakeEventManager
+ * =====================================================
+ * 
+ * PowerApp::loadEventListener( 'Vendor', 'Foo', 'MyEventClass' );
+ * 
+ * Enter description here ...
+ * @param unknown_type $repo
+ * @param unknown_type $sub
+ * @param unknown_type $class_name
+ */
+	
+	public static function loadEventListener( $repo, $sub, $class_name = '' ) {
+		
+		// No sub-package folder present
+		if ( empty($class_name) ) {
+			$class_name = $sub;
+			$sub 		= '';
+		}
+		
+		App::uses( 'CakeEventListener', 'Event' );
+		App::uses( 'Folder', 			'Utility' );
+		
+		foreach ( App::path($repo) as $repo_path ) {
+			
+			$repo_path .= $sub . DS;
+			
+			if ( !file_exists($repo_path) ) continue;
+			
+			// Import and add instance to the CakeEventManager
+			if ( App::import( $repo.'/'.$sub, $class_name ) ) CakeEventManager::instance()->attach( new $class_name() );
+			
+		}
+		
+	}
+	
+	
+/**
+ * Loads all classes files found inside a package
+ * ==============================================
+ * 
+ * PowerApp::loadEventListeners( 'Vendor', 'AppEvents' );
+ * 
+ * @param unknown_type $repo
+ * @param unknown_type $sub
+ */	
 	public static function loadEventListeners( $repo, $sub ) {
 		
 		App::uses( 'CakeEventListener', 'Event' );

@@ -142,5 +142,52 @@ class PowerAuthComponent extends AuthComponent {
 		/** ##CakePOWER## **/
 		
 	}
+	
+	
+	
+	
+/**
+ * Refresh logged-in user's data from database.
+ * Utility method to be used after profile data changes.
+ */	
+	function refreshUserData() {
+		
+		// Can't update user's data cause no login information was found!
+		if ( !$this->user('id') ) return false;
+		
+		// Step through authentication objects to find a valid user model to use to update data
+		$this->_setDefaults();
+		
+		if (empty($this->_authenticateObjects)) {
+			$this->constructAuthenticate();
+		}
+		
+		foreach ($this->_authenticateObjects as $auth) {
+			
+			if ( !empty($auth->settings['userModel']) ) {
+				
+				$result = ClassRegistry::init($auth->settings['userModel'])->findById( $this->user('id') );
+				
+				if ( $result !== false ) {
+					
+					// merge related models the AuthComponent way!
+					$user = $result[$auth->settings['userModel']];
+					unset($user[$auth->settings['fields']['password']]);
+					unset($result[$auth->settings['userModel']]);
+					
+					// update session and return a non-false value, the new user data!
+					CakeSession::write(self::$sessionKey, array_merge($user, $result) );
+					return $this->user();
+				
+				}
+			
+			}
+			
+		}
+		
+		// no way to recognise user... 
+		return false;
+		
+	}
 
 }

@@ -165,6 +165,20 @@ class PowerConfig {
 		return $keyVal == $checkVal;
 		
 	}
+
+	
+
+/**
+ * Check a key to be an array
+ */	
+	public static function isArray( $key = null ) {
+		
+		$keyVal = PowerConfig::get( $key );
+		
+		return is_array($keyVal);
+		
+	}
+	
 	
 	
 	

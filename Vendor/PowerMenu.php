@@ -135,7 +135,29 @@ class PowerMenu {
 			);
 			$item[self::$children] = self::_treeLevel($val);
 			
-			$tree[] = $item;
+			// IF Statement - boolean
+			// conditional display of a menu item
+			// $item => array(
+			//     $displayModel => array(
+			//          _name => 
+			//          show =>
+			//          url => 
+			//          if => AuthComponent::user() !== null (only authenticated users!)
+			//     )
+			// )
+			if ( isset($item[self::$displayModel]['if']) ) {
+				
+				$_if = $item[self::$displayModel]['if'];
+				unset( $item[self::$displayModel]['if'] );
+				
+				if ( $_if ) $tree[] = $item;
+				unset($_if);
+				
+			} else $tree[] = $item;
+			
+			#debug($item);
+			
+			
 		
 		}
 		

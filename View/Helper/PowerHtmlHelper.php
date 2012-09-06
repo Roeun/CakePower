@@ -618,7 +618,8 @@ class PowerHtmlHelper extends HtmlHelper {
 		if ( strpos($title,'<span') 		!== false ) $options += array( 'escape'=>false );
 		if ( strpos($title,'<strong') 		!== false ) $options += array( 'escape'=>false );
 		if ( strpos($title,'<em') 			!== false ) $options += array( 'escape'=>false );
-		if ( strpos($title,'<br') 			!== false ) $options += array( 'escape'=>false );
+		if ( strpos($title,'<i') 			!== false ) $options += array( 'escape'=>false );
+		if ( strpos($title,'<b') 			!== false ) $options += array( 'escape'=>false );
 		
 		return parent::link( $title, $url, $options, $confirmMessage );
 		

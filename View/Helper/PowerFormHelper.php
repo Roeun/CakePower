@@ -33,4 +33,18 @@ class PowerFormHelper extends FormHelper {
 	
 	}
 	
+	
+/**
+ * error()
+ * options string value shortcut
+ */	
+	function error( $field = '', $message = null, $options = array() ) {
+		
+		// translate string option to the array required version
+		if ( is_string($options) ) $options = array( 'class'=>$options );
+		
+		return parent::error( $field, $message, $options );
+	
+	}
+	
 }
