@@ -190,4 +190,141 @@ class PowerString extends String {
 	
 	
 	
+	
+/**	
+ * Random Password Generation
+ * ==========================
+ * 
+ * This utility generates random strings!
+ * 
+ * PowerString::passwd( 5, 8 );
+ * -> a string between 5 and 8 chars from all available namespaces
+ * 
+ * PowerString::passwd( 10, 10, 'n' );
+ * -> a numeric string of exactly 10 chars
+ * 
+ * PowerString::passwd( 10,20,'abc' );
+ * -> a string between 10 and 20 chars, each car is "a" or "b" or "c" from the given custom namespace
+ * 
+ * @var unknown_type
+ */
+	public static $passwdNamespaces = array(
+		'n' => '0123456789',
+		'c' => 'qazwsxedcrfvtgbyhnujmikolp',
+		'm' => 'QAZWSXEDCRFVTGBYHNUJMIKOLP',
+		's' => ',;.:-_@#*!\\"$%&/()=?^+[]\'',
+		'i' => '@#-_.'
+	);
+	
+	public static function passwd( $min = 8, $max = 10, $space = 'ncmi' ) {
+		
+		// Specific namespace
+		if ( array_key_exists( $space, PowerString::$passwdNamespaces ) ) {
+			$space = PowerString::$passwdNamespaces[$space];
+		
+		// Composite namespace
+		} else if ( in_array( $space, array('nc','nm', 'ncm', 'ns', 'cs', 'ms', 'ni', 'ci', 'mi', 'cmi', 'ncmi' ) ) ) {
+			
+			$_space = '';
+			
+			for ( $i=0; $i<strlen($space);$i++ ) {
+				
+				$_space .= self::$passwdNamespaces[$space[$i]];
+				
+			}
+			
+			$space = $_space;
+			
+		}
+		
+		// Full namespace
+		if ( empty($space) ) {
+			foreach ( array_keys(self::$passwdNamespaces) as $k ) {
+				$space.= self::$passwdNamespaces[$k];	
+			}
+		}
+		
+		// Utility vars
+		$lspace = strlen($space)-1;
+		$passwd = '';
+		
+		// Generate random password
+		for ( $i=0; $i<rand( $min, $max ); $i++ ) $passwd .= $space[rand(0,$lspace)];
+		return $passwd;
+		
+	}
+	
+	
+/**
+ * zeroFill()
+ * ==========
+ * 
+ * Prepends a number of chars (0) at the beginning of a given string.
+ * zeroFill( 99, 4 ) -> 0099
+ */
+	function zeroFill( $str, $len = 3, $options = array() ) {
+		
+		// Default options
+		if ( is_bool($options) ) 	$options = array( 'append'	=> $options );
+		if ( is_string($options) ) 	$options = array( 'char'	=> $options );
+		$options += array( 'append'=>false, 'char'=>'0' );
+		
+		while ( strLen($str) < $len )
+			
+			if ( $options['append'] ) {
+				$str .= $options['char'];
+				
+			} else {
+				$str = $options['char'].$str;
+				
+			}
+			
+		return $str;
+		
+	} // EndOf: "zeroFill()" ######################################################################
+	
+	
+	
+	
+/**
+ * euro()
+ * ======
+ * 
+ * float2euro utility
+ * changes decimal dot sparator to a slash then adds dots as 1/1000 separator
+ */
+	function euro( $val = 0 ) {
+		$val = str_replace('.',',',$val);
+		if ( strPos($val,',') !== false ) {
+			$int = subStr($val,0,strPos($val,','));
+			$dec = subStr($val,strPos($val,',')+1,strLen($val));
+		} else {
+			$int = $val;
+			$dec = '';
+		}
+		
+		// Applicazione dei "punti" di separazione delle migliaia.
+		$mill 	= '';
+		$cont	= 0;
+	
+		for ( $i=(strLen($int)-1); $i>=0; $i-- ) {
+			
+			if ( $cont == 3 ) {
+				$mill = '.' . $mill;
+				$cont = 0;
+			}
+			
+			$mill = substr($int,$i,1) . $mill;
+			$cont++;
+		}
+		
+		if ( empty($mill) ) $mill = "0";
+		$dec = substr($dec,0,2);
+		
+		return $mill.",".self::zeroFill( $dec, 2, true );
+		
+	} // EndOf: "euro()" ##########################################################################
+	
+	
+	
 }

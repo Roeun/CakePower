@@ -534,6 +534,81 @@ class PowerHtmlHelper extends HtmlHelper {
 		
 	}
 	
+	
+/**	
+ * Definition List Utility
+ * =======================
+ * 
+ * @param unknown_type $data
+ * @param unknown_type $options
+ */
+	public function dl( $data = '', $options = array() ) {
+		
+		$options += array( 'dtOptions'=>array(), 'ddOptions'=>array(), 'skipEmptyValues'=>true );
+		
+		// Build List Body
+		ob_start();
+		foreach ( $data as $lbl=>$val ) {
+			
+			if ( $options['skipEmptyValues'] && empty($val) ) continue;
+			
+			echo $this->tag( 'dt', $lbl, $options['dtOptions'] );
+			echo $this->tag( 'dd', $val, $options['ddOptions'] );
+			
+		}
+		
+		unset($options['dtOptions']);
+		unset($options['ddOptions']);
+		unset($options['skipEmptyValues	']);
+		
+		// Build List Wrapper with Options
+		return $this->tag( 'dl', ob_get_clean(), $options );
+		
+	}
+	
+	public function listTag( $type = 'ul', $data = array(), $options = array() ) {
+		
+		if ( !is_array($options) ) $options = array( 'class'=>$options );
+		$options += array( 'liOptions'=>array(), 'skipEmptyValues'=>true );
+		
+		
+		// Build List Body
+		ob_start();
+		foreach ( $data as $content=>$liOptions ) {
+			
+			if ( is_numeric($content) ) {
+				$content = $liOptions;
+				$liOptions = array();
+			}
+			
+			$liOptions = PowerSet::merge( $options['liOptions'], $liOptions );
+			
+			if ( $options['skipEmptyValues'] && empty($content) ) continue;
+			
+			echo $this->tag( 'li', $content, $liOptions );
+			
+		}
+		
+		unset($options['liOptions']);
+		unset($options['skipEmptyValues']);
+		
+		// Build List Wrapper with Options
+		return $this->tag( $type, ob_get_clean(), $options );
+		
+	}
+	
+	public function ul( $data = '', $options = array() ) {
+		
+		return $this->listTag( 'ul', $data, $options );
+		
+	}
+	
+	public function ol( $data = '', $options = array() ) {
+		
+		return $this->listTag( 'ol', $data, $options );
+		
+	}
+	
 
 /**	
  * Utility to create a DOM named item form a view's block of data.

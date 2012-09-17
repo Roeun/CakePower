@@ -7,6 +7,7 @@
  
 App::uses('Controller', 'Controller');
 
+App::uses( 'PowerComponent', 'CakePower.Controller/Component' );
 
 
 class CakePowerController extends Controller {
@@ -110,7 +111,7 @@ class CakePowerController extends Controller {
 	
 	public function addModel( $name, $config = array(), $override = true ) {
 		
-		return $this->addLib( 'models', $name, $config, $override );
+		if ( !in_array( $name, $this->uses) ) $this->uses[] = $name;
 		
 	}
 	

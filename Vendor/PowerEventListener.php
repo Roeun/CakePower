@@ -271,6 +271,7 @@ class PowerEventListener implements CakeEventListener {
 		// request, Models, Components, Helpers 
 		if ( $this->_importProperties && $this->subject ) {
 			
+			// Controller
 			if ( is_subclass_of($this->subject, 'Controller') ) {
 				
 				// Import Request
@@ -292,6 +293,25 @@ class PowerEventListener implements CakeEventListener {
 				
 			}
 			
+			// Model
+			// !! "data" property should not be imported cause conflict with
+			// event's "data" property!
+			if ( is_subclass_of($this->subject, 'Model') ) {
+				
+				// Import belongsTo models
+				foreach ( $this->subject->belongsTo as $k ) {
+					$k = $k['className'];
+					
+					if ( isset($this->subject->$k) && is_subclass_of($this->subject->$k, 'Model') ) {
+						$this->$k =& $this->subject->$k;
+						$this->_importedProperties[] = $k;
+					}
+					
+				}
+				
+			}
+			
+			// View
 			if ( get_class($this->subject) === 'View' ) {
 				
 				// Import Request

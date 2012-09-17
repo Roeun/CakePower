@@ -307,6 +307,7 @@ class PowerSessionComponent extends SessionComponent {
 			'message'			=> $message,
 			 
 			'validationErrors'	=> array(),
+			'validationFields'	=> array(),
 			'requestData'		=> array(),
 			
 			// rest specific data
@@ -317,8 +318,9 @@ class PowerSessionComponent extends SessionComponent {
 		
 		// Adds controller's validation errors to the data response.
 		if ( empty($options['validationErrors']) ) {
-			$data['validationErrors'] = $this->ajaxErrors();
-			$data['validationErrors'] = $data['validationErrors']['models'];
+			$tmp = $this->ajaxErrors();
+			$data['validationErrors'] = $tmp['models'];
+			$data['validationFields'] = $tmp['fields'];
 		}
 		
 		// Adds controller's request data to the data response.
