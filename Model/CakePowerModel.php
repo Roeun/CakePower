@@ -99,6 +99,16 @@ class CakePowerModel extends Model {
 		
 	}
 	
+	
+	
+/**	
+ * equalToField()
+ * ==============
+ * 
+ * Custom Validation,
+ * ensure a field value is equal to another field value
+ * 
+ */
 	public function equalToField( $check, $fieldName ) {
 		
 		if ( !isset($this->data[$this->alias][$fieldName]) ) return false;
