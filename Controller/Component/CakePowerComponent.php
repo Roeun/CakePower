@@ -1,6 +1,6 @@
 <?php
 
-class PowerComponent extends Component {
+class CakePowerComponent extends Component {
 	
 	protected $Controller = null;
 	

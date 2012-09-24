@@ -7,8 +7,8 @@
  
 App::uses('Controller', 'Controller');
 
-App::uses( 'PowerComponent', 'CakePower.Controller/Component' );
-
+// Lazy loads the CakePowerComponent
+App::uses( 'CakePowerComponent', 'CakePower.Controller/Component' );
 
 class CakePowerController extends Controller {
 	
