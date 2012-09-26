@@ -1,5 +1,6 @@
 <?php
 App::uses('Model', 'Model');
+App::uses('CakePowerBehavior', 'CakePower.Model/Behavior');
 
 class CakePowerModel extends Model {
 
