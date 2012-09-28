@@ -37,5 +37,16 @@ class CakePowerComponent extends Component {
 		}
 	
 	}
+	
+	
+	
+/**	
+ * Shortcut to PowerConfig::pval() method to access a param by name
+ * searching multiple places
+ */
+	public function pval( $key = null, $def = null ) { return PowerConfig::pval($key,$def); }
+	
+	
+	
 
 }

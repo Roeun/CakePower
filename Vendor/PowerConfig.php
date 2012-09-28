@@ -152,6 +152,50 @@ class PowerConfig {
 		return $tmp;
 		
 	}
+	
+
+/**
+ * Read data from a path searching in a number of different places where data
+ * should be present.
+ * 
+ * Basically is intended to fetch data form a named param, form data, session,
+ * powerConfig, etc.
+ * 
+ * it's api traces out PowerConfig::get() api allowing to pass a default value
+ * if no other values are found.
+ * 
+ * "pval" stands for "param value".
+ * 
+ */	
+	public static function pval( $key = null, $default = null ) {
+		
+		$val = '';
+		
+		if ( PowerConfig::exists( 'request.data.'.$key ) ) {
+			$val = PowerConfig::get( 'request.data.'.$key );
+			
+		} elseif ( PowerConfig::exists( 'request.params.named.'.$key ) ) {
+			$val = PowerConfig::get( 'request.params.named.'.$key );
+			
+		} elseif ( SessionComponent::check($key) ) {
+			$val = SessionComponent::read($key);
+		
+		} elseif ( PowerConfig::exists($key) ) {
+			$val = PowerConfig::get($key);
+			
+		} elseif ( isset($_POST[$key]) ) {
+			$val = $_POST[$key];
+			
+		} elseif( isset($_GET[$key]) ) {
+			$val = $_POST[$key];
+			
+		}
+		
+		if ( empty($val) && $default !== null ) return $default;
+		
+		return $val;
+	
+	} 
 
 	
 /**	

@@ -69,6 +69,7 @@ class CakePowerController extends Controller {
 		
 		// Set request params to the global access configuration to allow an easy access.
 		PowerConfig::set( 'request.params', $this->request->params );
+		PowerConfig::set( 'request.data', 	$this->request->data ) ;
 		
 		// TMP: here will be listed controller's services...
 		foreach ( $this->methods as $i=>$val ) {
@@ -155,6 +156,13 @@ class CakePowerController extends Controller {
 	}
 
 	
+	
+	
+/**	
+ * Shortcut to PowerConfig::pval() method to access a param by name
+ * searching multiple places
+ */
+	public function pval( $key = null, $def = null ) { return PowerConfig::pval($key,$def); }
 	
 	
 	/*

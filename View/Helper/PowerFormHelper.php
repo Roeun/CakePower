@@ -9,8 +9,8 @@ App::import( 'View/Helper', 'FormHelper' );
 
 
 class PowerFormHelper extends FormHelper {
-	
-	
+
+
 	// Default options for create() method.
 	protected $formClass 		= '';
 	protected $formStyle		= '';
@@ -24,9 +24,9 @@ class PowerFormHelper extends FormHelper {
 	 * Form open tag utility.
 	 * some options default values should be hard coded into the
 	 * helper's class and should be extended by instance options.
-	 * 
+	 *
 	 * you can set some "override{Property}" options to tell
-	 * helper to override defaults with instance configuration options. 
+	 * helper to override defaults with instance configuration options.
 	 *
 	 * @overrideClass
 	 * @overrideStyle
@@ -43,7 +43,7 @@ class PowerFormHelper extends FormHelper {
 
 		// Extend form class string
 		if ( !isset($options['overrideClass']) ) {
-			 
+
 			if ( empty($options['class']) ) {
 				$options['class'] = $this->formClass;
 			} else {
@@ -63,7 +63,7 @@ class PowerFormHelper extends FormHelper {
 
 		// Extends or overrid input defaults from instance configuration
 		if ( !isset($options['overrideInputDefaults']) ) $options['inputDefaults'] = PowerSet::merge($this->inputDefaults, $options['inputDefaults']);
-		
+
 		// Unset override indicators
 		unset($options['overrideClass']);
 		unset($options['overrideStyle']);
@@ -73,19 +73,51 @@ class PowerFormHelper extends FormHelper {
 		return parent::create($model, array_filter($options) );
 
 	}
-	
-	
-/**	
- * generate an input form field
- * a string option translates to field's label
- */
+
+
+	/**
+	 * generate an input form field
+	 * a string option translates to field's label
+	 */
 	public function input( $field, $options = '' ) {
+
+		return parent::input( $field, $this->_inputOptions($options) );
+
+	}
+
+	protected function _inputOptions( $options = array() ) {
 		
-		// Options defaults
-        if (is_string($options)) $options = array('label' => $options);
-        
-        return parent::input( $field, $options );
+		// String options is converted to a label
+		if ( is_string($options) ) {
+			$options = array( 'label' => $options );
+		}
+
+		// Options default values
+		$options+= array(
+        	'label' => array()
+		);
+
+		// String label is converted to array format
+		if ( isset($options['label']) && is_string($options['label']) ) {
+			$options['label'] = array( 'text'=>$options['label'] );
+		}
 		
+		// Merge label options with default values
+		if ( isset($this->inputDefaults['label']) ) {
+			
+			// Convert input defaults label into array format
+			if ( is_string($this->inputDefaults['label']) ) $this->inputDefaults['label'] = array( 'text'=>$this->inputDefaults['label'] ); 
+			
+			$options['label'] = PowerSet::pushDiff( $this->inputDefaults['label'], $options['label'] );
+			
+		}
+		
+		// Remove empty keys to allow CakePHP defaults to be applied
+		$options['label'] = array_filter($options['label']);
+		$options = array_filter($options);
+		
+		return $options;
+
 	}
 
 
@@ -98,7 +130,7 @@ class PowerFormHelper extends FormHelper {
 	 *
 	 */
 	function end( $options = null ) {
-		
+
 		return parent::end($options);
 
 	}
