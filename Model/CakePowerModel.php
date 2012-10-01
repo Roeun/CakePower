@@ -6,6 +6,15 @@ class CakePowerModel extends Model {
 
 	
 	
+	public function __construct( $class = null, $alias = null, $id = null ) {
+		
+		// Adds core behaviors to every models
+		if ( empty($this->actsAs) ) $this->actsAs = array();
+		$this->actsAs[] = 'CakePower.BubbleEvents';
+		
+		parent::__construct( $class, $alias, $id );
+	
+	}
 	
 	
 	public function loadModel( $model = '' ) {
@@ -132,6 +141,16 @@ class CakePowerModel extends Model {
 	public function pval( $key = null, $def = null ) { return PowerConfig::pval($key,$def); }
 	
 	
+	
+	/*
+	public function afterSave($created) {
+		
+		parent::afterSave($created);
+		
+		$this->created = $created;
+		
+	}
+	*/
 	
 	
 	
