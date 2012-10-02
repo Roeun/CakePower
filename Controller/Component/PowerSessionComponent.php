@@ -53,7 +53,7 @@ class PowerSessionComponent extends SessionComponent {
 		
 		if ( is_string($options) ) $options = array( 'title'=>$options );
 		
-		$this->setFlash( $str, 'default', $options, 'ok' );
+		$this->setFlash( $str, 'default', $options, 'success' );
 		if ( $redirect ) $this->Controller->redirect( $redirect );
 		 
 	}
@@ -62,7 +62,7 @@ class PowerSessionComponent extends SessionComponent {
 		
 		if ( is_string($options) ) $options = array( 'title'=>$options );
 		
-		$this->setFlash( $str, 'default', $options, 'ko' );
+		$this->setFlash( $str, 'default', $options, 'error' );
 		if ( $redirect ) $this->Controller->redirect( $redirect );
 		
 	}
@@ -80,7 +80,7 @@ class PowerSessionComponent extends SessionComponent {
 
 		if ( is_string($options) ) $options = array( 'title'=>$options );
 		
-		$this->setFlash( $str );
+		$this->setFlash( $str, 'default', $options, 'flash' );
 		if ( $redirect ) $this->Controller->redirect( $redirect );
 	
 	}
@@ -394,7 +394,7 @@ class PowerSessionComponent extends SessionComponent {
 ### HIGH LEVEL NOTIFICATION UTILITIES                                                           ###
 ###################################################################################################
 	
-	public function confirm( $str, $redirect = array(), $options = array() ) {
+	public function success( $str, $redirect = array(), $options = array() ) {
 		
 		// Ajax
 		$ajaxOptions = PowerSet::merge(array(
@@ -466,7 +466,7 @@ class PowerSessionComponent extends SessionComponent {
 		
 	}
 	
-	public function message( $str, $redirect = array(), $options = array() ) {
+	public function info( $str, $redirect = array(), $options = array() ) {
 		
 		// Ajax
 		$ajaxOptions = PowerSet::merge(array(
@@ -491,7 +491,9 @@ class PowerSessionComponent extends SessionComponent {
 	}
 	
 	
-	
+	// deprecated named functions
+	public function confirm( $a, $b = array(), $c = array() ) { $this->success($a,$b,$c); }
+	public function message( $a, $b = array(), $c = array() ) { $this->info($a,$b,$c); }
 	
 	
 	

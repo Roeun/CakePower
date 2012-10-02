@@ -37,10 +37,26 @@ class PowerSet extends Set {
 	
 	
 	
+/**
+ * [overrides Set::filter]
+ * Filters non empty, non 0 and non false items from an array.
+ */
 	
+	public static function filter( array $var ) {
+		
+		return Hash::filter($var,array( 'PowerSet', '_filter'));
+		
+	}
 	
-	
-	
+	public static function _filter($var) {
+		
+		if ( $var === 0 || $var === '0' || $var === false || !empty($var) ) {
+			return true;
+		}
+		
+		return false;
+		
+	}
 	
 	
 	

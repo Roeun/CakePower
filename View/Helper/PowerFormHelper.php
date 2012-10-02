@@ -81,6 +81,7 @@ class PowerFormHelper extends FormHelper {
 	 */
 	public function input( $field, $options = '' ) {
 
+		#return parent::input( $field, $options );
 		return parent::input( $field, $this->_inputOptions($options) );
 
 	}
@@ -88,19 +89,24 @@ class PowerFormHelper extends FormHelper {
 	protected function _inputOptions( $options = array() ) {
 		
 		// String options is converted to a label
-		if ( is_string($options) ) {
-			$options = array( 'label' => $options );
-		}
+		if ( is_string($options) ) $options = array( 'label' => $options );
+		
+		
 
 		// Options default values
 		$options+= array(
         	'label' => array()
 		);
-
+		
+		
+	
+			
 		// String label is converted to array format
 		if ( isset($options['label']) && is_string($options['label']) ) {
 			$options['label'] = array( 'text'=>$options['label'] );
 		}
+		
+		
 		
 		// Merge label options with default values
 		if ( isset($this->inputDefaults['label']) ) {
@@ -112,9 +118,12 @@ class PowerFormHelper extends FormHelper {
 			
 		}
 		
+		
+		
+		
 		// Remove empty keys to allow CakePHP defaults to be applied
-		$options['label'] = array_filter($options['label']);
-		$options = array_filter($options);
+		if ( is_array($options['label']) ) $options['label'] = PowerSet::filter($options['label']);
+		$options = PowerSet::filter($options);
 		
 		return $options;
 
