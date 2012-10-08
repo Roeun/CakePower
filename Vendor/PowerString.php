@@ -29,7 +29,7 @@ class PowerString extends String {
 		// Auto set for remove unused placeholder.
 		if ( !isset($options['clean']) ) $options['clean'] = true;
 		
-		$str = self::insert( $tpl, $data, $options );
+		$str = self::insert( $tpl, PowerSet::flatten($data), $options );
 		
 		if ( $options['clear'] ) $str = self::stripPlaceholders($str,$options);
 		

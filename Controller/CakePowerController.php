@@ -82,6 +82,10 @@ class CakePowerController extends Controller {
 	
 	
 	
+
+	
+	
+	
 	
 /**	
  * Utilities to add libraries to the controller during the constructor method.
@@ -135,24 +139,62 @@ class CakePowerController extends Controller {
  * 
  * it handle the same input required by set()
  */
-	public function tell( $key, $val = null, $msg = null ) {
+	public function tell( $key = null, $val = null, $msg = null ) {
+		
+		if ( func_num_args() === 1 && is_string($key) ) {
+			$msg = $key;
+			$key = null;
+			$val = null;
+		}
 		
 		// rest/ajax message as 2nd parameter
 		if ( is_array($key) && !empty($val) ) $msg = $val;
 		
 		// handle simple key/value esportation translating to an array
-		if ( !is_array($key) ) $key = array( $key=>$val );
+		if ( !is_array($key) && $key !== null ) $key = array( $key=>$val );
+		
+		// Merge with already setted view vars
+		if ( !empty($this->viewVars) ) {
+			if ( empty($key) ) $key = array();
+			$key = PowerSet::merge( $this->viewVars, $key );
+		}
 		
 		// apply a default message
 		if ( empty($msg) ) $msg = 'export';
 		
 		// Export REST and AJAX data
-		if ( $this->Session->restOk( $msg, $key )) return;
-		$this->Session->ajaxOk( $msg, $key );
+		if ( $this->Session->restMsg( $msg, $key )) return true;
+		$this->Session->ajaxMsg( $msg, $key );
 		
 		// Export data to the view
 		$this->set($key);
 	
+	}
+	
+	
+	public function redirect($url, $status = null, $exit = true) {
+		
+		// AJAX Redirect reqest
+		if (
+			$this->Session->ajaxResponse( null, 'redirect', array(
+				'redirect' 	=> $url,
+				'status'	=> $status ? $status : 307
+			))
+		
+		) return;
+			
+		// REST redirect request
+		if (
+		
+			$this->Session->restResponse( null, 'redirect', array(
+				'redirect' 	=> $url,
+				'status'	=> $status ? $status : 307
+			))
+		
+		) return;
+		
+		parent::redirect($url,$status,$exit);
+		
 	}
 
 	

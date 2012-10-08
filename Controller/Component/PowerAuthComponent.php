@@ -155,6 +155,7 @@ class PowerAuthComponent extends AuthComponent {
 		// Can't update user's data cause no login information was found!
 		if ( !$this->user('id') ) return false;
 		
+		
 		// Step through authentication objects to find a valid user model to use to update data
 		$this->_setDefaults();
 		

@@ -247,7 +247,7 @@ class PowerSessionComponent extends SessionComponent {
 	
 	public function ajaxKo( $message, $options = array() ) {
 		
-		$options+= array( 'status'=>404 );
+		$options+= array( 'status'=>400 );
 		
 		$this->ajaxResponse( 'ko', $message, $options );
 		
@@ -305,7 +305,8 @@ class PowerSessionComponent extends SessionComponent {
 			'type'				=> 'rest',
 			'status'			=> $msg, 
 			'message'			=> $message,
-			 
+			'redirect'			=> '',
+			
 			'validationErrors'	=> array(),
 			'validationFields'	=> array(),
 			'requestData'		=> array(),
@@ -321,7 +322,8 @@ class PowerSessionComponent extends SessionComponent {
 			$tmp = $this->ajaxErrors();
 			$data['validationErrors'] = $tmp['models'];
 			$data['validationFields'] = $tmp['fields'];
-		}
+		} unset($options['validationErrors']);
+		
 		
 		// Adds controller's request data to the data response.
 		// you can set "requestData = false" in the options to prevent this behavior! 
@@ -331,15 +333,28 @@ class PowerSessionComponent extends SessionComponent {
 		unset($options['requestData']);
 		
 		
+		// Export redirect informations to the data array
+		if ( isset($options['redirect']) ) {
+			if ( !empty($options['redirect']) && is_array($options['redirect']) ) $options['redirect'] = Router::url($options['redirect']);
+			$data['redirect'] = $options['redirect'];
+		} unset($options['redirect']);
+		
+		
+		// Setup response status code from option params
+		if ( !empty($options['status']) ) {
+			$this->Controller->response->statusCode($options['status']);
+			if ( empty($data['status']) ) $data['status'] = $options['status'];
+		} unset($options['status']);
+		
+		
+		// Setup data and exports to default REST view:
 		$data['_serialize'] = $this->_rest_serialize($options);
 		
 		$this->Controller->set( '_response', 	$data );
 		$this->Controller->set( '_serialize', 	PowerSet::merge(array('_response'),$data['_serialize']) );
 		
-		if ( !empty($options['status']) ) header('HTTP/1.0 ' . $options['status'] . ' ' . $message, true, 500);
-		
+		// Render REST view:
 		$this->Controller->render();
-		
 		return true;
 	
 	}
@@ -352,7 +367,7 @@ class PowerSessionComponent extends SessionComponent {
 	
 	public function restKo( $message, $options = array() ) {
 		
-		$options+= array( 'status'=>404 );
+		$options+= array( 'status'=>400 );
 		
 		return $this->restResponse( 'ko', $message, $options );
 		
@@ -396,6 +411,9 @@ class PowerSessionComponent extends SessionComponent {
 	
 	public function success( $str, $redirect = array(), $options = array() ) {
 		
+		// Options boolean type
+		if ( !is_array($options) && is_bool($options) ) $options = array( 'requestData'=>$options );
+		
 		// Ajax
 		$ajaxOptions = PowerSet::merge(array(
 			'redirect' 		=> $this->ajaxRedirect($redirect),
@@ -407,6 +425,7 @@ class PowerSessionComponent extends SessionComponent {
 		
 		// Rest
 		$restOptions = PowerSet::merge(array(
+			'redirect' 		=> $this->ajaxRedirect($redirect),
 			'requestData' 	=> false
 		),$options);
 		
@@ -420,6 +439,9 @@ class PowerSessionComponent extends SessionComponent {
 	
 	public function error( $str, $redirect = array(), $options = array() ) {
 		
+		// Options boolean type
+		if ( !is_array($options) && is_bool($options) ) $options = array( 'requestData'=>$options );
+		
 		// Ajax
 		$ajaxOptions = PowerSet::merge(array(
 			'redirect' 		=> $this->ajaxRedirect($redirect),
@@ -431,7 +453,8 @@ class PowerSessionComponent extends SessionComponent {
 		
 		// Rest
 		$restOptions = PowerSet::merge(array(
-			'requestData' 	=> false
+			'requestData' 	=> false,
+			'redirect' 		=> $this->ajaxRedirect($redirect),
 		),$options);
 		
 		if ( $this->restKo( $str, $restOptions ) ) return;
@@ -444,6 +467,9 @@ class PowerSessionComponent extends SessionComponent {
 	
 	public function alert( $str, $redirect = array(), $options = array() ) {
 		
+		// Options boolean type
+		if ( !is_array($options) && is_bool($options) ) $options = array( 'requestData'=>$options );
+		
 		// Ajax
 		$ajaxOptions = PowerSet::merge(array(
 			'redirect' 		=> $this->ajaxRedirect($redirect),
@@ -455,6 +481,7 @@ class PowerSessionComponent extends SessionComponent {
 		
 		// Rest
 		$restOptions = PowerSet::merge(array(
+			'redirect' 		=> $this->ajaxRedirect($redirect),
 			'requestData' 	=> false
 		),$options);
 		
@@ -468,6 +495,9 @@ class PowerSessionComponent extends SessionComponent {
 	
 	public function info( $str, $redirect = array(), $options = array() ) {
 		
+		// Options boolean type
+		if ( !is_array($options) && is_bool($options) ) $options = array( 'requestData'=>$options );
+		
 		// Ajax
 		$ajaxOptions = PowerSet::merge(array(
 			'redirect' 		=> $this->ajaxRedirect($redirect),
@@ -479,6 +509,7 @@ class PowerSessionComponent extends SessionComponent {
 		
 		// Rest
 		$restOptions = PowerSet::merge(array(
+			'redirect' 		=> $this->ajaxRedirect($redirect),
 			'requestData' 	=> false
 		),$options);
 		
