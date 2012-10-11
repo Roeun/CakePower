@@ -276,10 +276,12 @@ class PowerHtmlHelper extends HtmlHelper {
 			return null;
 		}
 		$this->_includedScripts[$url] = true;
-
+		
+		
 		if (strpos($url, '//') === false) {
+			
 			$url = $this->assetUrl($url, $options + array('pathPrefix' => JS_URL, 'ext' => '.js'));
-
+			
 			if (Configure::read('Asset.filter.js')) {
 				$url = str_replace(JS_URL, 'cjs/', $url);
 			}
@@ -287,10 +289,37 @@ class PowerHtmlHelper extends HtmlHelper {
 		
 		
 		
-		
+		/**
+		 * RequireJS Optimization
+		 * ======================
+		 * 
+		 * mechanism to change javascript source files from js/ to js-compiled/ folder.
+		 * this is extremely useful when implement a RequireJS application! 
+		 * 
+		 * @TODO: check if compiled js folder exists!
+		 * 
+		 * 
 		/** @@CakePOWER@@ **/
+		
+		// allow to change js default folder from "js" to "js-compiled"
+		$jsUrl = substr(JS_URL, 0, strlen(JS_URL)-1);
+		
+		// setup debug mode into session to test across multiple requests
+		if ( isset($_GET['jsdbgOn']) ) 	SessionComponent::write('jsdbg',true);
+		if ( isset($_GET['jsdbgOff']) ) SessionComponent::delete('jsdbg');
+		
+		// decide what js folder to use based on combination on debug status
+		if (
+				( Configure::read('debug') == 0 && !isset($_GET['jsdbg']) && !SessionComponent::check('jsdbg') ) 	// production mode + debug
+			||	( Configure::read('debug') > 0 && ( isset($_GET['jsdbg']) || SessionComponent::check('jsdbg') ) )	// developement mode + production test
+		) $jsUrl .= '-compiled';
+		
+		// Replace in-page scripts urls
+		$url = str_replace( JS_URL, $jsUrl.'/', $url );
+		
+		// RequireJS DATA-MAIN attribute parsing
 		if ( strpos($url,'require') !== false && isset($options['data-main']) && strpos($options['data-main'],'//') === false ) {
-			$options['data-main'] = $this->assetUrl($options['data-main'], array('pathPrefix' => JS_URL, 'ext' => '.js'));
+			$options['data-main'] = $this->assetUrl($options['data-main'], array('pathPrefix' => $jsUrl.'/', 'ext' => '.js'));
 		}
 		/** --CakePOWER-- **/
 		
