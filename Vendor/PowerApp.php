@@ -344,12 +344,15 @@ class PowerApp {
  * @param unknown_type $repo
  * @param unknown_type $sub
  */	
-	public static function loadEventListeners( $repo, $sub ) {
+	public static function loadEventListeners( $repo, $sub = '', $plugin = '' ) {
 		
 		App::uses( 'CakeEventListener', 'Event' );
+		App::uses( 'PowerEventListener', 'CakePower.Vendor' );
 		App::uses( 'Folder', 			'Utility' );
 		
-		foreach ( App::path($repo) as $repo_path ) {
+		if ( strpos($sub,'.') !== false) list( $plugin, $sub ) = explode('.',$sub);
+		
+		foreach ( App::path($repo,$plugin) as $repo_path ) {
 			
 			$repo_path .= $sub . DS;
 			
@@ -363,7 +366,7 @@ class PowerApp {
 				$class_name = PowerString::getFirstTrunk($file_name);
 				
 				// Import and add instance to the CakeEventManager
-				if ( App::import( $repo.'/'.$sub, $class_name ) ) CakeEventManager::instance()->attach( new $class_name() );
+				if ( App::import( $repo.'/'.$sub, ( $plugin ? $plugin.'.' : '' ) . $class_name ) ) CakeEventManager::instance()->attach( new $class_name() );
 				
 			}
 		
