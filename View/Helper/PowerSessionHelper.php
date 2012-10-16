@@ -58,7 +58,7 @@ class PowerSessionHelper extends SessionHelper {
 	
 	
 	
-	public function flash( $key=null, $attrs=array() ) {
+	public function flash( $key=ALL, $attrs=array() ) {
 		
 		// shortcuts to flashes
 		if ( $key === ALL ) 	return $this->flashes( null, $attrs );

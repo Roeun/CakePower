@@ -346,9 +346,9 @@ class PowerApp {
  */	
 	public static function loadEventListeners( $repo, $sub = '', $plugin = '' ) {
 		
-		App::uses( 'CakeEventListener', 'Event' );
-		App::uses( 'PowerEventListener', 'CakePower.Vendor' );
-		App::uses( 'Folder', 			'Utility' );
+		App::uses( 'CakeEventListener', 	'Event' );
+		App::uses( 'PowerEventListener', 	'CakePower.Vendor' );
+		App::uses( 'Folder', 				'Utility' );
 		
 		if ( strpos($sub,'.') !== false) list( $plugin, $sub ) = explode('.',$sub);
 		

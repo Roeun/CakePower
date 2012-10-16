@@ -64,6 +64,14 @@ App::uses( 'CakePowerController', 'CakePower.Controller' );
 
 
 
+/**
+ * Adds new top level package used to automagically loading of events listener classes.
+ * These classes should be placed into plugins and are loaded by CakePOWER bootstrap!
+ */
+
+App::build(array(
+    'EventListener' => array('%s' . 'EventListener' . DS)
+), App::REGISTER);
 
 
 
@@ -269,11 +277,26 @@ foreach ( $plugins as $plugin ) {
 	if ( !CakePlugin::loaded($plugin['_info']['name']) ) continue;
 	PowerConfig::set( 'plugin.'.$plugin['_info']['name'], $plugin );
 	
+	
+	
+	/**
+	 * Load plugin's event listeners
+	 */
+	
+	PowerApp::loadEventListeners( 'EventListener', '', $plugin['_info']['name'] );
+	
+	
 }
 
 // Set up loaded plugins info to the app configuration key.
 PowerConfig::set( 'app.plugins', CakePlugin::loaded() );
 
+
+
+/**
+ * Loads application level event listener classes
+ */
+PowerApp::loadEventListeners( 'EventListener' );
 
 
 /**

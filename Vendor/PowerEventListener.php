@@ -284,7 +284,7 @@ class PowerEventListener implements CakeEventListener {
 		}
 		
 		// Imports subject properties
-		// request, Models, Components, Helpers 
+		// request, Models, Components, Helpers
 		if ( $this->_importProperties && $this->subject ) {
 			
 			// Controller
@@ -346,6 +346,7 @@ class PowerEventListener implements CakeEventListener {
 			
 		}
 		
+		
 		// Indagates request function's name if there is an event based implementation
 		if ( strpos($name,'__evt__') !== false ) {
 			
@@ -357,7 +358,23 @@ class PowerEventListener implements CakeEventListener {
 				$this->eventName 	= $this->methods[$name];
 				
 				// Run event's method
+				ob_start();
 				$val = call_user_method_array( $name, $this, $args );
+				$tmp = ob_get_clean();
+				
+				/**
+				 * Start session before output anything!!!
+				 * this is a must instruction. i spent 1 hour solving an issue tied up with session!
+				 * 
+				 * CakePHP lazily loads session (CakeSession) the first time a session is needed.
+				 * If some callbacks output anything es with debug a session need to be initializated
+				 * before to send data to the client.
+				 */
+				if ( !empty($tmp) ) {
+					App::uses('CakeSession', 'Model/Datasource');
+					CakeSession::start();
+					echo $tmp;
+				}
 				
 				// Automagically render() call for events methods
 				if ( $val === true ) {
@@ -369,6 +386,8 @@ class PowerEventListener implements CakeEventListener {
 				} else if ( is_array($val) ) {
 					$this->render( null, $val );
 				}
+				
+				
 			
 			}
 				

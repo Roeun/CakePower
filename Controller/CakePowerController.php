@@ -89,12 +89,8 @@ class CakePowerController extends Controller {
 		foreach ( $this->methods as $i=>$val ) {
 			if ( substr($val,0,2) == '__' ) $this->methods[$i] = substr($val,2,100);
 		}
-	
+		
 	}
-	
-	
-	
-	
 	
 
 	
