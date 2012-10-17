@@ -279,11 +279,8 @@ foreach ( $plugins as $plugin ) {
 	
 	
 	
-	/**
-	 * Load plugin's event listeners
-	 */
-	
-	PowerApp::loadEventListeners( 'EventListener', '', $plugin['_info']['name'] );
+	// Load plugin's bootstrap event listeners
+	PowerApp::loadEventListeners( 'EventListener', 'Bootstrap', $plugin['_info']['name'] );
 	
 	
 }
@@ -293,16 +290,19 @@ PowerConfig::set( 'app.plugins', CakePlugin::loaded() );
 
 
 
-/**
- * Loads application level event listener classes
- */
-PowerApp::loadEventListeners( 'EventListener' );
+
+// Loads application level bootstrap's event listener classes
+PowerApp::loadEventListeners( 'EventListener', 'Bootstrap' );
+
+
 
 
 /**
  * Event: "pluginsLoaded()"
  */
 CakeEventManager::instance()->dispatch( new CakeEvent('CakePower.pluginsLoaded') );
+
+
 
 
 

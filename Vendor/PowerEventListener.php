@@ -287,62 +287,38 @@ class PowerEventListener implements CakeEventListener {
 		// request, Models, Components, Helpers
 		if ( $this->_importProperties && $this->subject ) {
 			
-			// Controller
-			if ( is_subclass_of($this->subject, 'Controller') ) {
-				
-				// Import Request
-				$this->request =& $this->subject->request;
-				$this->_importedProperties[] = 'request';
-				
-				// Import Models
-				foreach ( $this->subject as $k=>$v ) {
+			
+			// Imports subject's objects
+			foreach ( $this->subject as $k=>$v ) {
 					
-					if ( is_object($v) && is_subclass_of($v, 'Model') ) {
-						$this->{$k} =& $this->subject->$k;	
-						$this->_importedProperties[] = $k;
-					}
-				}
-				
-				// Import Components
-				foreach ( $this->subject->components as $k=>$v ) {
-					if ( is_int($k) ) $k = $v;
-					$this->$k =& $this->subject->$k;
+				if (
+					is_object($v) 
+					&& (
+							is_subclass_of($v, 'Model')
+						|| 	is_subclass_of($v, 'Behavior')
+						|| 	is_subclass_of($v, 'Component')
+						|| 	is_subclass_of($v, 'Helper')
+					) 
+				) {
+					$this->{$k} =& $this->subject->$k;	
 					$this->_importedProperties[] = $k;
+					
 				}
 				
 			}
 			
-			// Model
-			// !! "data" property should not be imported cause conflict with
-			// event's "data" property!
-			if ( is_subclass_of($this->subject, 'Model') ) {
-				
-				// Import Linked Models
-				foreach ( $this->subject as $k=>$v ) {
-					
-					if ( is_object($v) && is_subclass_of($v, 'Model') ) {
-						$this->{$k} =& $this->subject->$k;	
-						$this->_importedProperties[] = $k;
-					}
-				}
-				
-			}
-			
-			// View
-			if ( get_class($this->subject) === 'View' ) {
-				
-				// Import Request
+			// Subject's request object
+			if ( isset($this->subject->request) ) {
 				$this->request =& $this->subject->request;
 				$this->_importedProperties[] = 'request';
-				
-				// Import Helpers
-				foreach ( $this->subject->helpers as $k=>$v ) {
-					if ( is_int($k) ) $k = $v;
-					$this->$k =& $this->subject->$k;
-					$this->_importedProperties[] = $k;
-				}
-				
 			}
+			
+			// Subject's response object
+			if ( isset($this->subject->response) ) {
+				$this->response =& $this->subject->response;
+				$this->_importedProperties[] = 'response';
+			}
+			
 			
 		}
 		
@@ -387,8 +363,6 @@ class PowerEventListener implements CakeEventListener {
 					$this->render( null, $val );
 				}
 				
-				
-			
 			}
 				
 		}

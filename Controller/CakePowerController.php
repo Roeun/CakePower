@@ -78,6 +78,20 @@ class CakePowerController extends Controller {
 		));
 		
 		
+		
+		// -- evt --
+		// CakePower.beforeConstruct 
+		CakeEventManager::instance()->dispatch($e =new CakeEvent('CakePower.beforeConstruct',$this,array(
+			'request' 	=> $request,
+			'response' 	=> $response
+		)));
+		
+		if ( !empty($e->results['request']) ) 	$request 	= $e->results['request'];
+		if ( !empty($e->results['response']) ) 	$response 	= $e->results['response'];
+		// -- evt --
+		
+		
+		
 		parent::__construct( $request, $response );
 		
 		
@@ -89,6 +103,21 @@ class CakePowerController extends Controller {
 		foreach ( $this->methods as $i=>$val ) {
 			if ( substr($val,0,2) == '__' ) $this->methods[$i] = substr($val,2,100);
 		}
+		
+		// Loads Event Listeners
+		foreach ( PowerConfig::get('app.plugins') as $pluginName ) PowerApp::loadEventListeners( 'EventListener', '', $pluginName );
+		PowerApp::loadEventListeners( 'EventListener' );
+		
+		
+		
+		// -- evt --
+		// CakePower.onLoad 
+		CakeEventManager::instance()->dispatch($e = new CakeEvent('CakePower.onConstruct',$this,array(
+			'request' 	=> $request,
+			'response' 	=> $response
+		)));
+		// -- evt --
+		
 		
 	}
 	
