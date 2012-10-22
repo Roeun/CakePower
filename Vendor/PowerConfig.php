@@ -203,7 +203,7 @@ class PowerConfig {
 			$val = $_POST[$key];
 			
 		} elseif( isset($_GET[$key]) ) {
-			$val = $_POST[$key];
+			$val = $_GET[$key];
 			
 		}
 		
