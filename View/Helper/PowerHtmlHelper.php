@@ -166,10 +166,15 @@ class PowerHtmlHelper extends HtmlHelper {
 			
 			/** @@CakePOWER@@ **/
 			// Compile less source to the css output file.
-			// If debug > 0 
-			$source = $this->assetPath($path, $options + array('pathPrefix' => LESS_URL, 'ext' => '.less'));
-			$target = $this->assetPath($path, $options + array('pathPrefix' => CSS_URL, 'ext' => '.css', 'exists'=>false));
-			if ( ( !file_exists($target) || Configure::read('debug') ) && file_exists($source) ) $this->auto_compile_less($source, $target);
+			// If debug > 0
+			
+			// "$this->assetPath()" exists only if AppHelpers extends CakePowerHelper!
+			// by checking it's existance we remove an ugly notice while installing the CakePOWER!  
+			if ( method_exists( $this, 'assetPath') ) {
+				$source = $this->assetPath($path, $options + array('pathPrefix' => LESS_URL, 'ext' => '.less'));
+				$target = $this->assetPath($path, $options + array('pathPrefix' => CSS_URL, 'ext' => '.css', 'exists'=>false));
+				if ( ( !file_exists($target) || Configure::read('debug') ) && file_exists($source) ) $this->auto_compile_less($source, $target);
+			}
 			/** --CakePOWER-- **/
 			
 			
