@@ -288,11 +288,36 @@ class PowerEventListener implements CakeEventListener {
 		if ( $this->_importProperties && $this->subject ) {
 			
 			
-			// Imports subject's objects
+			// Imports related models
+			if ( is_subclass_of($this->subject,'Model') ) {
+				
+				if ( !empty($this->subject->belongsTo) ) foreach( $this->subject->belongsTo as $k=>$v) {
+					if ( isset($this->{$k}) ) continue;
+					$this->{$k} =& $this->subject->$k;	
+					$this->_importedProperties[] = $k;
+				}
+				
+				if ( !empty($this->subject->hasMany) ) foreach( $this->subject->hasMany as $k=>$v) {
+					if ( isset($this->{$k}) ) continue;
+					$this->{$k} =& $this->subject->$k;	
+					$this->_importedProperties[] = $k;
+				}
+				
+				if ( !empty($this->subject->hasOne) ) foreach( $this->subject->hasOne as $k=>$v) {
+					if ( isset($this->{$k}) ) continue;
+					$this->{$k} =& $this->subject->$k;	
+					$this->_importedProperties[] = $k;
+				}
+			
+			}
+			
+			
+			// Imports subject's mishellaneous objects
 			foreach ( $this->subject as $k=>$v ) {
-					
+								
 				if (
-					is_object($v) 
+					!isset($this->{$k})
+					&& is_object($v) 
 					&& (
 							is_subclass_of($v, 'Model')
 						|| 	is_subclass_of($v, 'Behavior')
