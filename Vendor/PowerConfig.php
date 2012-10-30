@@ -56,6 +56,18 @@ class PowerConfig {
 	}
 	
 	
+/**	
+ * Test for a path to be empty
+ */
+	public static function isEmpty( $key = null ) {
+		
+		$val = self::get( $key );
+		
+		return empty($val);
+		
+	}
+	
+	
 /**
  * Set a value into a path overwriting preexistance contentents.
  * You can override all data by passing an array as first param.
