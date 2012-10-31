@@ -235,6 +235,11 @@ class PowerSessionComponent extends SessionComponent {
 		
 		if ( !empty($options['status']) ) header('HTTP/1.0 ' . $options['status'] . ' ' . $message, true, 500);
 		
+		// JSON headers
+		header('Cache-Control: no-cache, must-revalidate');
+		header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+		header('Content-type: application/json');
+		
 		echo json_encode($json);
 		exit;
 		
