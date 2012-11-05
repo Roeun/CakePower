@@ -225,14 +225,30 @@ class PowerString extends String {
  * @var unknown_type
  */
 	public static $passwdNamespaces = array(
-		'n' => '0123456789',
-		'c' => 'qazwsxedcrfvtgbyhnujmikolp',
-		'm' => 'QAZWSXEDCRFVTGBYHNUJMIKOLP',
-		's' => ',;.:-_@#*!\\"$%&/()=?^+[]\'',
-		'i' => '@#-_.'
+		'n' => '0123456789',						// numbers
+		'c' => 'qazwsxedcrfvtgbyhnujmikolp',		// chars
+		'm' => 'QAZWSXEDCRFVTGBYHNUJMIKOLP',		// maius
+		's' => ',;.:-_@#*!\\"$%&/()=?^+[]\'',		// special chars
+		'i' => '@#-_.',								// mail punctuation
 	);
 	
-	public static function passwd( $min = 8, $max = 10, $space = 'ncmi' ) {
+	public static function passwd( $min = 8, $max = null, $space = 'ncmi' ) {
+		
+		// charset namespace as first argument
+		if ( func_num_args() == 1 && is_string($min) ) {
+			$space = $min;
+			$min = 8;
+			$max = 8;
+		}
+		
+		// charset namespace as second argument
+		if ( func_num_args() == 2 && is_string($max) ) {
+			$space = $max;
+			$max = null;
+		}
+		
+		// $max default value for null option
+		if ( $max === null ) $max = $min;
 		
 		// Specific namespace
 		if ( array_key_exists( $space, PowerString::$passwdNamespaces ) ) {
@@ -255,9 +271,21 @@ class PowerString extends String {
 		
 		// Full namespace
 		if ( empty($space) ) {
+			
 			foreach ( array_keys(self::$passwdNamespaces) as $k ) {
 				$space.= self::$passwdNamespaces[$k];	
 			}
+		
+		// Custom namespace
+		// you can set whathever char you need to use as password char.
+		// you can use placeholders for simple namespaces ":n" for number namepace, etc
+		//
+		// "abc:n:i" means a, b, c, "n" namespace, "i" namespace
+		// "abc:" means a, b, c, :
+		} else {
+			
+			$space = PowerString::insert( $space, self::$passwdNamespaces );
+			
 		}
 		
 		// Utility vars
