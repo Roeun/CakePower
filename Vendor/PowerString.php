@@ -370,5 +370,56 @@ class PowerString extends String {
 	} // EndOf: "euro()" ##########################################################################
 	
 	
+
+/**	
+ * lastIndexOf()
+ * emulates javascript method
+ * @param string $haystack
+ * @param string $needle
+ */
+	public static function lastIndexOf( $haystack = '', $needle = '' ) {
+		
+		if ( strpos($haystack,$needle) === false ) return false;
+		
+		return strlen($haystack) - strpos(strrev($haystack),$needle) - ( strlen($needle) - 1 );
+	
+	}
+	
+	
+/**	
+ * explodeLastOccourrence
+ * It works just like explode() and outputs an array of tokens.
+ * 
+ * The difference is this method tokenizes only at the last occourrence of needle:
+ * 
+ *     PowerString::explodeLastOccourrence('/','/path/subpath/file')
+ *     -> array( '/path/subpath', 'file' )
+ * 
+ * @param string $needle
+ * @param string $haystack
+ */
+	
+	public static function explodeFirstOccourrence( $needle = '', $haystack = '' ) {
+		
+		$tmp = strpos( $haystack, $needle );
+		
+		return array(
+			substr( $haystack, 0, $tmp ),
+			substr( $haystack, ($tmp+strlen($needle)), strlen($haystack) ),
+		);
+	
+	}
+	
+	public static function explodeLastOccourrence( $needle = '', $haystack = '' ) {
+		
+		$tmp = PowerString::lastIndexOf( $haystack, $needle );
+		
+		return array(
+			substr( $haystack, 0, $tmp-1 ),
+			substr( $haystack, ($tmp+strlen($needle)-1), strlen($haystack) ),
+		);
+	
+	}
+	
 	
 }

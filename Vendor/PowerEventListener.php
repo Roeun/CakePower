@@ -141,6 +141,15 @@ class PowerEventListener implements CakeEventListener {
 	
 	
 /**	
+ * Elements Plugin Prefix
+ * ======================
+ * 
+ * Define a plugin name to search for event elements!
+ * 
+ */
+	public $elementPlugin		= '';
+	
+/**	
  * Render Var
  * ==========
  * 
@@ -430,14 +439,44 @@ class PowerEventListener implements CakeEventListener {
  * If an empty name is given the "actualMethodName" is used to render a binded element name.
  * 
  */	
-	public function element( $name = '', $data = array() ) {
+	public function element( $name = '', $data = array(), $options = array() ) {
+		
+		// Boolean true value teach to use a strict element name without contestualization!
+		if ( $options === true ) $options = array( 'strictName'=>true );
+		
+		// Options normalization
+		if ( !is_array($options) ) $options = array();
+		$options+= array( 'strictName'=>null );
+		
 		
 		if ( !$this->event ) return;
 		
 		if ( empty($name) && $this->methodName ) 		$name = $this->methodName;
 		if ( empty($data) ) 							$data = $this->event->data;
 		
-		$element_name = $this->elementPrefix . $this->name . '/' . $name;
+		// Use strict name for the element
+		if ( $options['strictName'] ) {
+			$element_name = $name;
+		
+		// Compose element name with a variety 
+		} else {
+			
+			// Strip plugin from element's name to unshift it into the full name
+			if ( strpos($name,'.') ) {
+				list( $plugin, $name ) = PowerString::explodeFirstOccourrence('.',$name);
+				
+			} else {
+				$plugin = $this->elementPlugin;
+					
+			}
+			
+			
+			// Stripped "this->name" from plugin name, now you need to define a full prefix to the element
+			//$element_name = $plugin . $this->elementPrefix . $this->name . '/' . $name;
+			$element_name = $plugin . ( !empty($plugin) ? '.' : '' ) . ( !empty($this->elementPrefix) ? '/' : '' ) . $name;
+			
+		}
+		
 		#ddebug($element_name);
 		
 		return $this->subject->element( $element_name, $data );
@@ -454,12 +493,12 @@ class PowerEventListener implements CakeEventListener {
  * 
  * 
  */
-	public function render( $name = '', $data = array() ) {
+	public function render( $name = '', $data = array(), $options = array() ) {
 		
 		if ( !$this->event ) return;
 		
 		// Assign a rendered element to the render result key 
-		$this->event->result[$this->renderVar] = $this->element( $name, $data );
+		$this->event->result[$this->renderVar] = $this->element( $name, $data, $options );
 		
 		// Automagically stopping events
 		if ( $this->stopOnRender ) $this->event->stopPropagation();
