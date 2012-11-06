@@ -156,8 +156,16 @@ class PowerEventListener implements CakeEventListener {
  * render() method should render a given element into a defined return key.
  * This setting define what key to use!
  * 
+ * ## multiRender
+ * di default l'azione di rendering sovrascrive la variabile di ritorno
+ * dell'evento. Un solo evento - l'ultimo - manda output.
+ * 
+ * Attivando l'opzione multiRender l'output di ogni evento  collezionato ed
+ * accodato alla variabile di putput.
+ * 
  */
 	public $renderVar 			= 'html';
+	public $multiRender			= false;
 	public $stopOnRender		= false;
 	
 	
@@ -491,14 +499,33 @@ class PowerEventListener implements CakeEventListener {
  * Render an Element as Event Result
  * =================================
  * 
+ * this method populates a result key for the event with some element() rendered data.
+ * results key name's is defined into $this->renderVar config option.
+ * 
+ * by default render() queue multiple rendered data if more than one eventListener
+ * call render() for an event.
+ * 
+ * You can force to clear previous collected data by passing a "true" 3rd param.
  * 
  */
 	public function render( $name = '', $data = array(), $options = array() ) {
 		
 		if ( !$this->event ) return;
 		
-		// Assign a rendered element to the render result key 
-		$this->event->result[$this->renderVar] = $this->element( $name, $data, $options );
+		// A boolean true value for options force to clean previous output
+		if ( $options === true ) $options = array( 'clearOutput'=>false );
+		
+		// Default options
+		if ( !is_array($options) ) $options = array();
+		$options+= array( 'clearOutput'=>false );
+		
+		// Clear before sent output
+		if ( $options['clearOutput'] === true ) unset($this->event->result[$this->renderVar]);
+		
+		// Queque a rendered element to the render result key
+		if ( empty($this->event->result[$this->renderVar]) ) $this->event->result[$this->renderVar] = '';
+		$this->event->result[$this->renderVar].= $this->element( $name, $data, $options );
+
 		
 		// Automagically stopping events
 		if ( $this->stopOnRender ) $this->event->stopPropagation();
