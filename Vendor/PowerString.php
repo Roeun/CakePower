@@ -45,6 +45,16 @@ class PowerString extends String {
 		// Auto set for remove unused placeholder.
 		if ( !isset($options['clean']) ) $options['clean'] = true;
 		
+		// strip objects from the data array cause an object can't be translated
+		// into a string
+		// 
+		// @TODO: may an object be translated to an associative array?
+		foreach ( $data as $dataKey=>$dataObj ) {
+			if (in_array(gettype($dataObj),array('object')) ) {
+				unset($data[$dataKey]);
+			}
+		}
+		
 		$str = self::insert( $tpl, PowerSet::flatten($data), $options );
 		
 		if ( $options['clear'] ) $str = self::stripPlaceholders($str,$options);
