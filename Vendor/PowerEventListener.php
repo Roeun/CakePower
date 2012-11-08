@@ -160,7 +160,7 @@ class PowerEventListener implements CakeEventListener {
  * di default l'azione di rendering sovrascrive la variabile di ritorno
  * dell'evento. Un solo evento - l'ultimo - manda output.
  * 
- * Attivando l'opzione multiRender l'output di ogni evento  collezionato ed
+ * Attivando l'opzione multiRender l'output di ogni evento ï¿½ collezionato ed
  * accodato alla variabile di putput.
  * 
  */
@@ -411,6 +411,23 @@ class PowerEventListener implements CakeEventListener {
 		
 	}
 	
+	
+	
+/**	
+ * Event Data Accessor
+ * ===================
+ * 
+ * Can access event's data returning an existing value or a default value
+ * if requested key is empty.
+ * 
+ */
+	public function get( $key = '', $default = '' ) {
+		
+		if ( empty($this->data[$key]) ) return $default;
+		
+		return $this->data[$key];
+		
+	}
 	
 	
 /**	
