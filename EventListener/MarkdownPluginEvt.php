@@ -106,21 +106,16 @@ class MarkdownPluginEvt extends PowerEventListener {
 			return $this->staticVal(substr($subject,1,strlen($subject)));
 		}
 		
-		
 		// viewVars
-		// uses PowerConfig structure for coding convenience.
-		// may not be the best performance method...
-		$tmp = 'tmp.' . $subject;
-		PowerConfig::set('tmp',$this->subject->viewVars);
-		
-		if ( PowerConfig::exists($tmp) ) {
-			$tmp = PowerConfig::get($tmp);
-			PowerConfig::del('tmp');
+		if ( ( $tmp = Set::extract( $subject, $this->subject->viewVars) ) !== null ) {
 			return $tmp;
 		}
 		
+		
 		// PowerConfig
-		if ( PowerConfig::exists($subject) ) return PowerConfig::get($subject);
+		if ( PowerConfig::exists($subject) ) {
+			return PowerConfig::get($subject);
+		}
 		
 	}
 	

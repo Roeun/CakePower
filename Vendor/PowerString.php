@@ -411,22 +411,46 @@ class PowerString extends String {
 	
 	public static function explodeFirstOccourrence( $needle = '', $haystack = '' ) {
 		
+		/*
 		$tmp = strpos( $haystack, $needle );
 		
 		return array(
 			substr( $haystack, 0, $tmp ),
 			substr( $haystack, ($tmp+strlen($needle)), strlen($haystack) ),
 		);
+		
+		??? May following solution performs better?
+		*/
+		
+		$tokens = explode( $needle, $haystack );
+		
+		return array(
+			array_shift($tokens),
+			implode($needle, $tokens)
+		);
 	
 	}
 	
 	public static function explodeLastOccourrence( $needle = '', $haystack = '' ) {
 		
+		/*
 		$tmp = PowerString::lastIndexOf( $haystack, $needle );
 		
 		return array(
 			substr( $haystack, 0, $tmp-1 ),
 			substr( $haystack, ($tmp+strlen($needle)-1), strlen($haystack) ),
+		);
+		
+		??? May following solution performs better?
+		*/
+		
+		$tokens = explode( $needle, $haystack );
+		
+		$tmp = array_pop($tokens);
+		
+		return array(
+			implode($needle, $tokens),
+			$tmp
 		);
 	
 	}
