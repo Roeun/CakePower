@@ -456,4 +456,38 @@ class PowerString extends String {
 	}
 	
 	
+	/**
+	 * convert an url format string to an array:
+	 * 
+	 *     foo=aa&foo1=bb
+	 *     -> array(
+	 *       'foo' => 'aa',
+	 *       'foo1' => 'bb'
+	 *     )
+	 * 
+	 */
+	public static function str2array( $string ) {
+		
+		$list = array();
+		
+		foreach ( explode('&',$string) as $item ) {
+			
+			if ( strpos($item,'=') !== false ) {
+				
+				list( $key, $val ) = PowerString::explodeFirstOccourrence( '=', $item );
+				
+				$list[$key] = $val;
+				
+			} else {
+				
+				$list[] = $val;
+				
+			}
+			
+		}
+		
+		return $list;
+		
+	}
+	
 }

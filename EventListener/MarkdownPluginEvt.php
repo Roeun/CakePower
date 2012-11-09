@@ -7,9 +7,17 @@
  * 
  * ## Property Tag
  * 
- *     {varName.subVar:filter1:filter2}
+ *     // access properties of viewVars and PowerConfig
+ *     {varName.subVar|filter1|filter2}
+ *     {varName.subVar|Helper.method|Static::method}
+ *     {!marco|ucfirst}
+ *     
+ *     // amplement generates an url with router
+ *     {![controller=foo&action=view]|Router::url}
  * 
- * 
+ * ## Link Tags
+ *     
+ *     {@text to tag|controller=foo&action=aaa|class=foo class&style=color:red}
  *
  * @author peg
  */
@@ -26,10 +34,68 @@ class MarkdownPluginEvt extends PowerEventListener {
 		
 		$string = $this->get('string');
 		
+		$string = $this->propertyLocales($string);
+		
+		$string = $this->propertyLinks($string);
+		
 		$string = $this->propertyTags($string);
 		
 		$this->set( 'string', PowerString::tpl( $string, $this->subject->viewVars ) );
 		
+	}
+	
+	
+	/**
+	 * localizes strings with __()
+	 * 
+	 *     ((to be translated))
+	 *     {!((to be translated))|ucfirst}
+	 * 
+	 */
+	private function propertyLocales( $subject ) {
+		
+		preg_match_all("|\(\((.*)\)\)|U", $subject, $matches);
+		for ( $i=0; $i<count($matches[0]); $i++ ) {
+			
+			$subject = str_replace( $matches[0][$i], __($matches[1][$i]), $subject);
+			
+		}
+		
+		return $subject;
+		
+	}
+	
+	
+	/**
+	 * generates CakePHP links
+	 * 
+	 *     {@text|url|params}
+	 *     {@click me|controller=pages&action=display&home|title=go to home page}
+	 */
+	private function propertyLinks( $subject ) {
+		
+		preg_match_all("|{@(.*)}|U", $subject, $matches);
+		for ( $i=0; $i<count($matches[0]); $i++ ) {
+			
+			$tag = $this->tagTokenizer($matches[1][$i]);
+			$tag+= array( 'url'=>array(), 'options'=>array() );
+			
+			// get link arguments
+			if ( !empty($tag['filters']) ) $tag['url']		= PowerString::str2array(array_shift($tag['filters']));
+			if ( !empty($tag['filters']) ) $tag['options']	= PowerString::str2array(array_shift($tag['filters']));
+			
+			// generate link if url was given and if HtmlHelper exists into
+			// the given context
+			if ( !empty($tag['url']) && is_callable(array($this->subject->Html,'link')) ) {
+				$replace = $this->subject->Html->link( $tag['subject'], $tag['url'], $tag['options'] );
+			}
+			
+			if ( isset($replace) ) $subject = str_replace ($matches[0][$i], $replace, $subject);
+			unset($replace);
+			
+		}
+		
+		return $subject;
 	}
 	
 	private function propertyTags( $subject ) {
@@ -130,26 +196,7 @@ class MarkdownPluginEvt extends PowerEventListener {
 		// ![key1=val&key2=val]
 		if ( substr($subject,0,1) === '[' && substr(strrev($subject),0,1) === ']' ) {
 			
-			$list = array();
-			
-			foreach ( explode('&',substr($subject,1,strlen($subject)-2)) as $item ) {
-				
-				
-				if ( strpos($item,'=') !== false ) {
-					
-					list( $key, $val ) = PowerString::explodeFirstOccourrence( '=', $item );
-					
-					$list[$key] = $val;
-					
-				} else {
-					
-					$list[] = $val;
-					
-				}
-				
-			}
-			
-			return $list;
+			return PowerString::str2array(substr($subject,1,strlen($subject)-2));
 			
 		}
 		
