@@ -61,6 +61,48 @@ App::uses( 'CakePowerController', 'CakePower.Controller' );
 
 
 
+/**
+ * Split a package from a class into a string:
+ * 
+ *     Vendor/ClassName
+ *     -> array(
+ *       'Vendor',
+ *       'ClassName'
+ *     )
+ * 
+ */
+function packageSplit( $className ) {
+	
+	if ( strpos($className,'/') ) {
+		return PowerString::explodeLastOccourrence('/',$className);
+		
+	} else {
+		return array( null, $className );
+		
+	}
+
+}
+
+/**
+ * Transform a package string into $className, $package vars:
+ * 
+ *     Plugin.Package/ClassName
+ *     -> array(
+ *       'ClassName',
+ *       'Plugin.Package'
+ *     )
+ */
+function packageCmp( $className ) {
+	
+	list( $plugin, $className ) 	= pluginSplit($className);
+	list( $package, $className ) 	= packageSplit($className);
+	
+	if ( !empty($plugin) ) $package = $plugin . '.' . $package;
+	
+	return array($className,$package);
+	
+}
+
 
 
 
