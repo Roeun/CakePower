@@ -331,5 +331,35 @@ class PowerSet extends Set {
 	}
 	
 	
+	
+	
+/**
+ * Search for keys to override.
+ * 
+ * key "_style" overrides "style" then is removed from the set.
+ * 
+ * @param array $config
+ */	
+	public static function configOverride( $config = array() ) {
+		
+		foreach ( $config as $key=>$val ) {
+			
+			// apply overridden value
+			if ( substr($key,0,1) === '_' ) {
+				$config[substr($key,1,strlen($key))] = $config[$key];
+				unset($config[$key]);
+			
+			// descends into sub arrays
+			} elseif ( is_array($val) ) {
+				$config[$key] = self::configOverride($val);
+			
+			}
+		
+		}
+		
+		return $config;
+		
+	}
+	
 
 }
