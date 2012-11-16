@@ -190,7 +190,7 @@ class PowerSet extends Set {
 	
 	public static function filter( array $var ) {
 		
-		return Hash::filter($var,array( 'PowerSet', '_filter'));
+		return Hash::filter($var,array('PowerSet', '_filter'));
 		
 	}
 	
