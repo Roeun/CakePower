@@ -293,7 +293,7 @@ class PowerConfig {
 		if ( !is_array($val) ) return self::set( $key, $val );
 		
 		// I use "Set" core library to extend desired path with new values.
-		self::set( $key, PowerSet::merge( $data, $val ) );
+		self::set( $key, PowerSet::extend( $data, $val, false ) );
 		
 	}
 	

@@ -22,8 +22,64 @@ class PowerSet extends Set {
 	
 	
 	
-	
-	
+	/**
+	 * http://movableapp.com/2012/11/power-set-todef-method-api/
+	 * 
+	 * @param string $arr
+	 * @param mixed $types
+	 */
+	public static function todef( $arr = '', $types = array(), $defaults = array() ) {
+		
+		if ( !empty($arr) && !is_array($arr) && !empty($types) ) {
+			
+			// array of types
+			if ( is_array($types) ) {
+				
+				$arr_type = gettype($arr);
+				
+				foreach ( $types as $type=>$field ) {
+					
+					if ( $arr_type == $type ) {
+						
+						$arr = array( $field=>$arr );
+							
+					}
+				
+				}
+			
+			// singular key for all non-array values
+			} elseif( is_string($types) ) {
+				
+				$arr = array( $types=>$arr );
+				
+			}
+		
+		}
+		
+		// safe conversion to always output an array
+		if ( !is_array($arr) || empty($arr) ) $arr = array();
+		if ( !is_array($defaults) || empty($defaults) ) $defaults = array();
+		
+		// translate scalar array (or items) to associative with null value
+		foreach ( $defaults as $key=>$val ) {
+			
+			if ( is_numeric($key) ) {
+				
+				unset($defaults[$key]);
+				
+				$defaults[$val] = null;
+			
+			}
+		
+		}
+		
+		// apply defaults
+		$arr = self::merge($defaults,$arr);
+		//$arr+= $defaults; 
+		
+		return $arr;
+		
+	}
 	
 	
 	
@@ -50,6 +106,81 @@ class PowerSet extends Set {
 	}
 
 	
+	/**
+	 * array merge utility
+	 * go recursive in merging arrays
+	 * 
+	 * use_reset_key feature:
+	 * if $b contains "_foo" it will reset $a['foo'] to a null value.
+	 * use it to remove values from the source array!
+	 * 
+	 * @param unknown_type $a
+	 * @param unknown_type $b
+	 */
+	public static function extend( $a = array(), $b = array() ) {
+		
+		$args = func_get_args();
+		$argc = func_num_args();
+		
+		// use last option as flag to the $use_reset_key option.
+		// only if boolean!!
+		$use_reset_key = true;
+		if ( is_bool($args[$argc-1]) ) {
+			$use_reset_key = $args[$argc-1];	
+		}
+		
+		// allow to push infinite arrays to the method
+		// extend( a1, a2, a3, ..., ax, true )
+		while ( $argc>2 && !is_bool($args[2]) ) {
+			
+			$a = array_shift($args);
+			$b = array_shift($args);
+			
+			$args = array_unshift($args, self::extend( $a, $b, $use_reset_key ) );
+			$argc = count($args); 
+		
+		}
+				
+		$a = self::todef( $a );
+		$b = self::todef( $b );
+		
+		if ( empty($b) ) return $a;
+		if ( empty($a) ) return $b;
+		
+		// if booth arrays are vectors (no associave) apply a "normal" merge method
+		if ( self::is_vector($a) && self::is_vector($b) ) return self::merge($a,$b);
+		
+		foreach ( $b as $key=>$val ) {
+			
+			if ( $use_reset_key && substr($key,0,1) === '_' ) {
+				$key = substr($key,1,strlen($key));
+				$a[$key] = null;
+			}
+			
+			// empty origin or scalar value - replace
+			if ( !array_key_exists($key,$a) || !is_array($val) ) {
+				$a[$key] = $val;
+			
+			// some kind of array
+			} else {
+				
+				// origin wasn't an array
+				if ( !is_array($a[$key]) ) {
+					$a[$key] = $val;
+				
+				// both vectors
+				} else {
+					$a[$key] = self::extend( $a[$key], $val );
+				
+				}
+				
+			}
+			
+		}
+		
+		return $a;
+	
+	}
 	
 	
 /**

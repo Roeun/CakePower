@@ -44,8 +44,22 @@ if ( !defined('LESS_URL') ) 	define( 'LESS_URL', 'less'.DS );
 
 class PowerHtmlHelper extends HtmlHelper {
 	
-	
-	
+	/**
+	 * A list of safe attributes to be allowed inside a tag()
+	 * 
+	 * @var array
+	 */
+	protected $_allowedAttributes = array(
+		'id',
+		'class',
+		'style',
+		'rel',
+		'title',
+		'alt',
+		'src',
+		'href',
+		'name'
+	);
 	
 	
 	public function __construct(View $View, $settings = array()) {
@@ -438,7 +452,6 @@ class PowerHtmlHelper extends HtmlHelper {
 			
 		} 
 		
-		
 		// Default handled options
 		if ( !is_array($options) ) $options = array();
 		$options+= array( 'if'=>true, 'else'=>'', 'allowEmpty'=>'span,td,th,i,b' );
@@ -490,8 +503,11 @@ class PowerHtmlHelper extends HtmlHelper {
 				//          array( 'name'=>'div', 'content'=>'foo2 )
 				//     )
 				//))
-				if ( is_array($item) ) $item = $this->tag( $item );
+				if ( is_array($item) ) {
+					$item = $this->tag( $item );
+				}
 				
+				// simple strings are quequed to the tag text!
 				$text.= $item;
 			
 			}
@@ -514,10 +530,77 @@ class PowerHtmlHelper extends HtmlHelper {
 		if ( empty($options['id']) ) 			unset($options['id']);
 		if ( empty($options['style']) ) 		unset($options['style']);
 		
+		// filters non standard attributes
+		foreach ( $options as $key=>$val ) {
+			if ( !$this->isValidTagOption($key) ) unset($options[$key]);
+		}
+		
 		// Use the CakePHP's parent method to output the HTML source.
 		return parent::tag( $name, $text, $options );
 	
 	}
+	
+	/**
+	 * Define if a tag option name is allowd inside the tag() method
+	 * @param unknown_type $key
+	 */
+	protected function isValidTagOption($key) {
+		
+		// filter allowed attributes
+		if ( in_array($key,$this->_allowedAttributes) ) return true;
+		
+		// allow all data- attributes
+		if ( substr($key,0,5) === 'data-' ) return true;
+		
+		return false;
+	}
+	
+	
+	protected function tagOptions( $arr = '', $options = array(), $defaults = array() ) {
+		
+		$options = PowerSet::todef( $options, 'txtAttr', array(
+			'txtAttr'		=> 'class',
+			'defaultAttrs'	=> ''
+		));
+		
+		// parse string configuration into inline CSS style or other given attribute (class)
+		if ( is_string($arr) ) {
+			
+			if ( strpos($arr,':') === false ) {
+				$arr = array( $options['txtAttr']=>$arr );
+				
+			} else {
+				$arr = array( 'style'=>$arr );
+				
+			}
+			
+		}
+		
+		return PowerSet::todef( $arr, $options['txtAttr'], $defaults );
+	
+	}
+	
+	
+	/**
+	 * Renders a list of tags
+	 * 
+	 * @param array $tags
+	 */
+	public function tags( $tags = array() ) {
+		
+		$html = '';
+		
+		foreach ( $tags as $tag ) {
+			
+			$html.= $this->tag($tag);
+		
+		}
+		
+		return $html;
+	
+	}
+	
+	
 
 	
 /**	
