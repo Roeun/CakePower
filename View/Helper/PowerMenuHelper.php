@@ -29,6 +29,12 @@ App::import( 'Helper', 'CakePower.PowerTree' );
 
 
 class PowerMenuHelper extends PowerTreeHelper {
+	
+	public function setActive( $path = '' ) {
+		
+		PowerMenu::setActive( $path );
+		
+	}
 
 	public function generate( $path, $config = array() ) {
 		
@@ -70,16 +76,24 @@ class PowerMenuHelper__TreeHelperExtension extends TreeHelperExtension {
 		
 		if ( empty($node['PowerMenu']['show']) ) $node['PowerMenu']['show'] = $node['PowerMenu']['_name'];
 		
-		// sets up a configuration array for the link item
-		$opt = array( 'class'=>'' );
+		$node['PowerMenu']['params'] = PowerHtmlHelper::tagOptions( $node['PowerMenu']['params'], array(
+			'class' => '',
+			'title' => $node['PowerMenu']['show']
+		), 'title');
 		
-		// extends the node text DOM params with something stored into the node data.
-		if ( !empty($node['PowerMenu']['params']) ) $opt = PowerSet::merge( $opt, $node['PowerMenu']['params'] );
+		// sets up the active class for the item
+		if ( $node['PowerMenu']['active'] ) $node['PowerMenu']['params']['class'] .= ' active';
+		
+		return $this->subject()->Html->link( $node['PowerMenu']['show'], $node['PowerMenu']['url'], $node['PowerMenu']['params'] );
+		
+	}
+	
+	function itemOptions( $opt, $node, $depth ) {
 		
 		// sets up the active class for the item
 		if ( $node['PowerMenu']['active'] ) $opt['class'] .= ' active';
 		
-		return $this->subject()->Html->link( $node['PowerMenu']['show'], $node['PowerMenu']['url'], $opt );
+		return $opt;
 		
 	}
 

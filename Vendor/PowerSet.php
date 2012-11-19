@@ -18,17 +18,13 @@
 class PowerSet extends Set {
 	
 	
-	
-	
-	
-	
 	/**
 	 * http://movableapp.com/2012/11/power-set-todef-method-api/
 	 * 
 	 * @param string $arr
 	 * @param mixed $types
 	 */
-	public static function todef( $arr = '', $types = array(), $defaults = array() ) {
+	public static function def( $arr = '', $defaults = array(), $types = array() ) {
 		
 		if ( !empty($arr) && !is_array($arr) && !empty($types) ) {
 			
@@ -56,6 +52,7 @@ class PowerSet extends Set {
 		
 		}
 		
+		
 		// safe conversion to always output an array
 		if ( !is_array($arr) || empty($arr) ) $arr = array();
 		if ( !is_array($defaults) || empty($defaults) ) $defaults = array();
@@ -74,10 +71,19 @@ class PowerSet extends Set {
 		}
 		
 		// apply defaults
-		$arr = self::merge($defaults,$arr);
-		//$arr+= $defaults; 
+		$arr = self::extend($defaults,$arr);
 		
 		return $arr;
+		
+	}
+	
+	
+	
+	public static function todef( $arr = '', $types = array(), $defaults = array() ) {
+		
+		trigger_error("WARNING!: todef() is now deprecated!",E_USER_WARNING);
+		
+		return self::def( $arr, $defaults, $types );
 		
 	}
 	
@@ -110,87 +116,86 @@ class PowerSet extends Set {
 	 * array merge utility
 	 * go recursive in merging arrays
 	 * 
-	 * use_reset_key feature:
+	 * ## reset array feature:
+	 * 
+	 * ## reset key feature:
 	 * if $b contains "_foo" it will reset $a['foo'] to a null value.
 	 * use it to remove values from the source array!
 	 * 
 	 * @param unknown_type $a
 	 * @param unknown_type $b
 	 */
-	public static function extend( $a = array(), $b = array() ) {
+	public static function extend() {
 		
 		$args = func_get_args();
-		$argc = func_num_args();
 		
-		// use last option as flag to the $use_reset_key option.
-		// only if boolean!!
-		$use_reset_key = true;
-		if ( is_bool($args[$argc-1]) ) {
-			$use_reset_key = $args[$argc-1];	
+		// set up reset key status with a last, boolean param
+		$use_reset_key = false;
+		if ( gettype($args[count($args)-1]) === 'boolean' ) {
+			$use_reset_key = $args[count($args)-1];
+			array_pop($args);
 		}
 		
-		// allow to push infinite arrays to the method
-		// extend( a1, a2, a3, ..., ax, true )
-		while ( $argc>2 && !is_bool($args[2]) ) {
+		$a = current($args);
+		while( ($b = next($args)) !== false ) {
 			
-			$a = array_shift($args);
-			$b = array_shift($args);
+			// an empty extending value will be ignored
+			if ( empty($b) ) continue;
 			
-			$args = array_unshift($args, self::extend( $a, $b, $use_reset_key ) );
-			$argc = count($args); 
-		
-		}
+			if ( !is_array($a) || empty($a) ) $a = array();
+			if ( !is_array($b) || empty($b) ) $a = array();
 				
-		$a = self::todef( $a );
-		$b = self::todef( $b );
-		
-		if ( empty($b) ) return $a;
-		if ( empty($a) ) return $b;
-		
-		// if booth arrays are vectors (no associave) apply a "normal" merge method
-		if ( self::is_vector($a) && self::is_vector($b) ) return self::merge($a,$b);
-		
-		foreach ( $b as $key=>$val ) {
+			// if booth arrays are vectors (no associave) apply a "normal" merge method
+			if ( self::is_vector($a) && self::is_vector($b) ) return self::merge($a,$b);
 			
-			if ( $use_reset_key && substr($key,0,1) === '_' ) {
-				$key = substr($key,1,strlen($key));
-				$a[$key] = null;
+			// $__overrides__$
+			// use reset array filled with keys to be resetted before the extension action. 
+			if ( array_key_exists('$__overrides__$', $b) ) {
+				foreach ( $b['$__overrides__$'] as $ovKey ) {
+					unset($a[$ovKey]);
+				}
+				unset($b['$__overrides__$']);
 			}
 			
-			// empty origin or scalar value - replace
-			if ( !array_key_exists($key,$a) || !is_array($val) ) {
-				$a[$key] = $val;
-			
-			// some kind of array
-			} else {
+			foreach ( $b as $key=>$val ) {
 				
-				// origin wasn't an array
-				if ( !is_array($a[$key]) ) {
+				// use reset key check
+				// this option is disabled by default
+				if ( $use_reset_key && substr($key,0,1) === '_' ) {
+					$key = substr($key,1,strlen($key));
+					$a[$key] = null;
+				}
+				
+				// empty origin or different types of values
+				if ( !array_key_exists($key,$a) || gettype($a[$key]) != gettype($val) || !is_array($val) ) {
 					$a[$key] = $val;
-				
-				// both vectors
+					
+				// some kind of array
 				} else {
 					$a[$key] = self::extend( $a[$key], $val );
-				
+					
 				}
 				
 			}
 			
-		}
+		} 
 		
 		return $a;
-	
+		
 	}
 	
 	
 /**
  * [overrides Set::filter]
  * Filters non empty, non 0 and non false items from an array.
+ * 
  */
 	
 	public static function filter( array $var ) {
 		
-		return Hash::filter($var,array('PowerSet', '_filter'));
+		$var = Hash::filter($var,array('PowerSet', '_filter'));
+		
+		return $var;
 		
 	}
 	
@@ -201,6 +206,20 @@ class PowerSet extends Set {
 		}
 		
 		return false;
+		
+	}
+	
+	public static function clear( array $var, $remove = array() ) {
+		
+		if (is_string($remove)) {
+			$remove = array($remove);
+		}
+		
+		foreach ($remove as $key) {
+			unset($var[$key]);
+		}
+		
+		return $var;
 		
 	}
 	

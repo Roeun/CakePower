@@ -433,6 +433,33 @@ class PowerHtmlHelper extends HtmlHelper {
  */	
 	public function tag( $name='div', $text = null, $options = array()) {
 		
+		
+		// -- XTYPE --
+		if ( is_array($name) && array_key_exists('xtype', $name) ) {
+			
+			$xtype = null;
+			if ( isset($name['xtype']) ) {
+				$xtype = $name['xtype'];
+				unset($name['xtype']);
+			}
+			
+			switch($xtype) {
+				case 'link':
+					$name = PowerSet::extend(array(
+						'data-xtype' => 'link',
+						'show' => '',
+						'url' => array()
+					),$name);
+					return $this->link($name['show'], $name['url'], PowerSet::clear($name, array('show', 'url')));
+			}
+			
+		}
+		// -- XTYPE --
+		
+		
+		// Handle a full vector notation to be converted into a list of tags
+		if ( is_array($name) && PowerSet::is_vector($name) ) return $this->tags($name);
+		
 		// Full array configuration.
 		// allow to set up every option in a single array.
 		if ( is_array($name) ) {
@@ -486,7 +513,7 @@ class PowerHtmlHelper extends HtmlHelper {
 			// )
 			//
 			// it translates a direct array content to a row of array contents as expected by the rest of the procedure.
-			if ( isset($text['content']) || isset($text['name']) || isset($text['class']) || isset($text['id']) ) $text = array( $text );
+			if ( isset($text['xtype']) || isset($text['content']) || isset($text['name']) || isset($text['class']) || isset($text['id']) ) $text = array( $text );
 			
 			$_text = $text;
 			
@@ -556,12 +583,22 @@ class PowerHtmlHelper extends HtmlHelper {
 	}
 	
 	
-	protected function tagOptions( $arr = '', $options = array(), $defaults = array() ) {
+	/**
+	 * Global accessible method to set default values for a tag() options array.
+	 * transform a string value into a "style" or "class" attribute depending on string
+	 * content
+	 * 
+	 */
+	public static function tagOptions( $arr = '', $defaultValues = null, $options = array() ) {
 		
-		$options = PowerSet::todef( $options, 'txtAttr', array(
-			'txtAttr'		=> 'class',
-			'defaultAttrs'	=> ''
-		));
+		// apply some defaults attributes to be used in every unspecified case
+		if ( $defaultValues === null ) {
+			$defaultValues = array( 'id'=>'', 'class'=>'', 'style'=>'' );
+		}
+		
+		$options = PowerSet::def( $options,array(
+			'txtAttr' => 'class'
+		),'txtAttr');
 		
 		// parse string configuration into inline CSS style or other given attribute (class)
 		if ( is_string($arr) ) {
@@ -576,7 +613,7 @@ class PowerHtmlHelper extends HtmlHelper {
 			
 		}
 		
-		return PowerSet::todef( $arr, $options['txtAttr'], $defaults );
+		return PowerSet::def($arr, $defaultValues, $options['txtAttr']);
 	
 	}
 	
@@ -592,7 +629,15 @@ class PowerHtmlHelper extends HtmlHelper {
 		
 		foreach ( $tags as $tag ) {
 			
-			$html.= $this->tag($tag);
+			if ( is_array($tag) ) {
+			
+				$html.= $this->tag(PowerSet::def($tag,null,'content'));
+				
+			} else {
+				
+				$html.= $tag;
+				
+			}
 		
 		}
 		

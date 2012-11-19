@@ -133,7 +133,7 @@ class PowerMenu {
 		
 		foreach ( $arr as $key=>$val ) {
 			
-			if ( $key == '**INFO**' ) continue;
+			if ( $key == '$__PowerMenuInfo__$' ) continue;
 			if ( empty($val) ) continue;
 			
 			// Compose the menu item as expected by the CakePHP's TreeHelper.
@@ -147,7 +147,7 @@ class PowerMenu {
 			//     )
 			// )
 			$item = array(
-				self::$displayModel => array_merge(array('_name'=>$key),$val['**INFO**']) 
+				self::$displayModel => array_merge(array('_name'=>$key),$val['$__PowerMenuInfo__$']) 
 			);
 			$item[self::$children] = self::_treeLevel($val);
 			
@@ -355,7 +355,7 @@ class PowerMenu {
 		
 		if ( !self::exists($path) ) return;
 		
-		PowerConfig::set( self::_fullPath($path) . '.**INFO**.active', true );
+		PowerConfig::set( self::_fullPath($path) . '.$__PowerMenuInfo__$.active', true );
 		
 	}
 	
@@ -363,7 +363,7 @@ class PowerMenu {
 		
 		if ( !self::exists($path) ) return;
 		
-		PowerConfig::set( self::_fullPath($path) . '.**INFO**.active', false );
+		PowerConfig::set( self::_fullPath($path) . '.$__PowerMenuInfo__$.active', false );
 		
 	}
 	
@@ -444,7 +444,7 @@ class PowerMenu {
 		if ( empty($itemData['show']) ) $itemData['show'] = $itemName; 
 		
 		return array(
-			$itemName 					=> array( '**INFO**'=>$itemData ),
+			$itemName 					=> array( '$__PowerMenuInfo__$'=>$itemData ),
 			self::$children 	=> $children
 		);
 		
@@ -464,7 +464,7 @@ class PowerMenu {
 				
 				$_path[] = $_subPath;
 				
-				PowerConfig::def( self::$_basePath . '.' . PowerSet::array2dots($_path), array( '**INFO**'=>self::$_defaults ));
+				PowerConfig::def( self::$_basePath . '.' . PowerSet::array2dots($_path), array( '$__PowerMenuInfo__$'=>self::$_defaults ));
 				
 			}
 		

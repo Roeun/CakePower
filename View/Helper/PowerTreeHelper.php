@@ -46,7 +46,9 @@
  */
 class PowerTreeHelper extends AppHelper {
 	
-	public $helpers = array( 'Html' );
+	public $helpers = array(
+		'Html'
+	);
 	
 	/**
 	 * Internal configuration.
@@ -433,19 +435,98 @@ class PowerTreeHelper extends AppHelper {
 					$itemText.= $this->__buildHTML( $tree[$i][$this->config('children')], $depth+1 );
 				
 				}
+				
+				// builds item's tag configuration
+				$itemOpt = PowerHtmlHelper::tagOptions($this->config('itemOpt'));
+				$itemOpt = $this->__buildHTML_itemOpt( $itemOpt, $tree[$i], $depth );
 			
 				//if ( $this->config('itemTag') ) $this->__line( $tt . '</' . $this->config('itemTag') . '>' );
-				echo $this->Html->tag( $this->config('itemTag'), $itemText, $this->config('itemOpt') );
+				echo $this->Html->tag( $this->config('itemTag'), $itemText, $itemOpt );
 			
 			}
 			
 		} 
 		
-		//if ( $this->config('listTag') ) $this->__line( $t . '</' . $this->config('listTag') . '>' );
+		// bulds list's tag configuration
+		$listOpt = PowerHtmlHelper::tagOptions($this->config('listOpt'));
+		$itemOpt = $this->__buildHTML_listOpt( $itemOpt, $tree, $depth );
 		
-		if ( $this->config('listTag') ) return $this->Html->tag( $this->config('listTag'), ob_get_clean(), $this->config('listOpt') ); else return ob_get_clean();
+		if ( $this->config('listTag') ) return $this->Html->tag( $this->config('listTag'), ob_get_clean(), $listOpt ); else return ob_get_clean();
 	
 	} // EndOf: "__buildHTML()" ###################################################################
+	
+	
+	/**
+	 * Allows external modifications of list item tag options.
+	 * 
+	 * @param unknown_type $cfg
+	 * @param unknown_type $treeItem
+	 * @param unknown_type $depth
+	 */
+	protected function __buildHTML_itemOpt( $cfg, $treeItem, $depth ) {
+		
+		// Use the extension class:
+		if ( $this->config('callable') ) {
+			
+			$tmp = $this->config('callable')->itemOptions( $cfg, $treeItem, $depth );
+			
+			if ( $tmp === false ) return $cfg;
+			
+			if ( $tmp !== null ) $cfg = $tmp;
+			
+		}
+		
+		
+		// Throw the callback function:
+		if ( $this->config('itemOptions') ) {
+			
+			$tmp = call_user_func( $this->config('itemOptions'), $cfg, $treeItem, $depth, $this );
+			
+			if ( $tmp === false ) return $cfg;
+			
+			if ( $tmp !== null ) $cfg = $tmp;
+			
+		}
+		
+		return $cfg;
+		
+	}
+	
+	/**
+	 * Allows external modifications of list item tag options.
+	 * 
+	 * @param unknown_type $cfg
+	 * @param unknown_type $treeItem
+	 * @param unknown_type $depth
+	 */
+	protected function __buildHTML_listOpt( $cfg, $tree, $depth ) {
+		
+		// Use the extension class:
+		if ( $this->config('callable') ) {
+			
+			$tmp = $this->config('callable')->listOptions( $cfg, $tree, $depth );
+			
+			if ( $tmp === false ) return $cfg;
+			
+			if ( $tmp !== null ) $cfg = $tmp;
+			
+		}
+		
+		
+		// Throw the callback function:
+		if ( $this->config('listOptions') ) {
+			
+			$tmp = call_user_func( $this->config('listOptions'), $cfg, $tree, $depth, $this );
+			
+			if ( $tmp === false ) return $cfg;
+			
+			if ( $tmp !== null ) $cfg = $tmp;
+			
+		}
+		
+		return $cfg;
+		
+	}
 	
 	
 	private function __outputHTML() {
@@ -559,12 +640,25 @@ class TreeHelperExtension {
 	}
 	
 	/**
-	 * Allow item customization.
+	 * Allows item customization.
 	 * return values:
 	 */
 	public function itemLogic( $treeItem, $depth ) {}
 	
 	public function displayLogic( $tree, $depth ) {}
+	
+	
+	/**
+	 * Allows tag options modifications
+	 * 
+	 * @param unknown_type $cfg
+	 * @param unknown_type $treeItem
+	 * @param unknown_type $depth
+	 */
+	
+	public function itemOptions( $cfg, $treeItem, $depth ) {}
+	
+	public function listOptions( $cfg, $tree, $depth ) {}
 
 }
 
