@@ -42,7 +42,10 @@ if ( !defined('LESS_URL') ) 	define( 'LESS_URL', 'less'.DS );
 
 
 
+
 class PowerHtmlHelper extends HtmlHelper {
+	
+	public static $xtypes = array();
 	
 	/**
 	 * A list of safe attributes to be allowed inside a tag()
@@ -389,7 +392,181 @@ class PowerHtmlHelper extends HtmlHelper {
 	
 	
 	
+	public function tag($name=null, $text=null, $options=array()) {
+		
+		if (is_array($name)) {
+			return $this->atag($name);
+		}
+		
+		if (empty($name)) {
+			$name = 'div';
+		}
+		
+		if (empty($text)) {
+			$text = '';
+		}
+		
+		// sets up default options ot handle tag's method behaviors
+		$options = $this->tagOptions($options, array(
+			'xtype' => 'tag',
+			'allowEmpty' => 'span,td,th,i,b,img,input',
+			'if' => true,
+			'else' => null,
+		));
+		
+		// extract Xtype and clear options
+		$xtype = $options['xtype'];
+		$options = PowerSet::clear($options, 'xtype');
+		
+		// apply Xtype configuration
+		list ($name, $text, $options) = $this->xtypeOptions($xtype, $name, $text, $options); 
+		
+		// check for empty value to be cleared:
+		if ( empty($text) && ( $options['allowEmpty'] == false || strpos($options['allowEmpty'], $name) === false ) ) {
+			return;	
+		}
+		
+		// handle conditional tag option:
+		switch( gettype($options['if']) ) {
+			case 'string':
+			case 'object':
+			case 'array':
+				$options['if'] = $this->solveTagConditional($name, $text, $options);
+				break;
+		}
+		
+		// apply conditional tag option:
+		// QUESTION: "else" should be another tag configuration array to output in-place
+		// of the actual or simply an alternative content to replace?
+		if ($options['if'] === false) {
+			if ($options['else'] !== null) {
+				return $this->tag($options['else']);
+			} else {
+				return;
+			}
+		}
+		
+		$options = PowerSet::clear($options, array(
+			'allowEmpty',
+			'if',
+			'else'
+		));
+		
+		// apply sub-tags
+		if ( is_array($text) ) {
+			$text = $this->atag($text);
+		}
+		
+		// apply xtype content
+		$xtype = $this->xtypeTag($xtype, $name, $text, $options);
+		if (is_string($xtype)) {
+			return $xtype;
+		}
+		
+		// filters non standard attributes
+		$options = $this->filterValidTagOptions($options);
+		
+		// Use the CakePHP's parent method to output the HTML source.
+		return parent::tag($name, $text, $options);
+		
+	}
 	
+	protected function xtypeOptions($xtype, $name, $text, $options) {
+		
+		switch ($xtype) {
+			case 'link':
+				if (isset($options['show'])) {
+					$text = $options['show'];
+					unset($options['show']);
+				}
+				break;
+			case 'image':
+				$name = 'img';
+				break;
+				
+		}
+		
+		return array($name, $text, $options);
+		
+	}
+	
+	protected function xtypeTag($xtype, $name, $text, $options) {
+		
+		switch ($xtype) {
+			case 'link':
+				return $this->link($text, $options['url'], $this->filterValidTagOptions(PowerSet::clear($options, 'url')));
+			case 'image':
+				return $this->image($options['src'], $this->filterValidTagOptions(PowerSet::clear($options, 'src')));
+		}
+		
+	}
+	
+	protected function solveTagConditional($name, $text, $options) {
+		
+		// direct callable object
+		if (is_callable($options['if'])) {
+			return call_user_func($options['if'], $name, $text, $options);
+		}
+		
+		// @TODO: needs to solve more complex callabel configurations like
+		// array( method, object )
+		// object::method
+		
+	}
+	
+	public function atag( $options = array() ) {
+		
+		// retro-compatibility notation
+		// may trigger a warning to alert that these keywords may not exists anymore!
+		if (isset($options['name']) || isset($options['content'])) {
+			if (isset($options['name'])) {
+				$options['tag'] = $options['name'];
+				unset($options['name']);
+			}
+			if (isset($options['content'])) {
+				$options['text'] = $options['content'];
+				unset($options['content']);
+			}
+		}
+		
+		// direct configuration array
+		if ( array_key_exists('xtype', $options) || array_key_exists('tag', $options) || array_key_exists('text', $options) ) {
+			
+			// search for a last non-associative value for the config array to be used as text or sub-tags
+			if ( !array_key_exists('text', $options) ) {
+				if ( gettype(array_pop(array_keys($options))) === 'integer' ) {
+					$options['text'] = array_pop($options);
+				}
+			}
+			
+			// apply tag's defaults
+			$options = PowerSet::extend(array(
+				'tag' => null,
+				'text' => null,
+			),$options);
+			
+			// apply standard params tag method
+			return $this->tag($options['tag'], $options['text'], PowerSet::clear($options, array('tag','text')));
+		
+		// list of sub-tags, generates a string as output.
+		// tag configuration items will be translated to tags, strings or other format will be appended as thei are. 
+		} else {
+			
+			$string = '';
+			
+			foreach ( $options as $tag ) {
+				if ( is_array($tag) ) {
+					$string.= $this->tag($tag);
+				} else {
+					$string.= $tag;
+				}
+			}
+			
+			return $string;
+			
+		}
+		
+	} 
 	
 	
 	
@@ -431,7 +608,7 @@ class PowerHtmlHelper extends HtmlHelper {
  * @param unknown_type $text
  * @param unknown_type $options
  */	
-	public function tag( $name='div', $text = null, $options = array()) {
+	public function __tag( $name='div', $text = null, $options = array()) {
 		
 		
 		// -- XTYPE --
@@ -580,6 +757,15 @@ class PowerHtmlHelper extends HtmlHelper {
 		if ( substr($key,0,5) === 'data-' ) return true;
 		
 		return false;
+	}
+	
+	protected function filterValidTagOptions($options) {
+		foreach ($options as $key=>$val) {
+			if (!$this->isValidTagOption($key)) {
+				unset($options[$key]);	
+			}
+		}
+		return $options;
 	}
 	
 	
