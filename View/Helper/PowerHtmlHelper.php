@@ -450,8 +450,8 @@ class PowerHtmlHelper extends HtmlHelper {
 		}
 		
 		// check for empty value to be cleared:
-		if ( empty($text) && ( $options['allowEmpty'] == false || strpos($options['allowEmpty'], $name) !== false ) ) {
-			return;	
+		if ( empty($text) && $options['allowEmpty'] !== true ) {
+			if (strpos($options['allowEmpty'], $name) === false) return;
 		}
 		
 		// clear options array
@@ -540,16 +540,19 @@ class PowerHtmlHelper extends HtmlHelper {
 		
 	}
 	
-	public function atag( $options = array() ) {
+	protected function atag( $options = array() ) {
 		
 		// retro-compatibility notation
 		// may trigger a warning to alert that these keywords may not exists anymore!
 		if (isset($options['name']) || isset($options['content'])) {
+			
 			if (isset($options['name'])) {
+				#trigger_error('PowerHtmlHelper::atag() "name" key is now deprecated!', E_USER_WARNING );
 				$options['tag'] = $options['name'];
 				unset($options['name']);
 			}
 			if (isset($options['content'])) {
+				#trigger_error('PowerHtmlHelper::atag() "content" key is now deprecated!', E_USER_WARNING );
 				$options['text'] = $options['content'];
 				unset($options['content']);
 			}
@@ -583,21 +586,46 @@ class PowerHtmlHelper extends HtmlHelper {
 		
 	} 
 	
-	public function atagDefaults($options) {
+	
+	/**
+	 * Fetch an implicit content from given array and translates into a full key=>val array
+	 * An optional last integer key will be translated into the content key:
+	 * 
+	 * array(
+	 *   'tag' => 'h2',
+	 *   'my title'
+	 * )
+	 * 
+	 * become:
+	 * 
+	 * array(
+	 *   'tag' => 'h2',
+	 *   'text' => 'my title'
+	 * )
+	 * 
+	 * @param array $options
+	 */
+	public function atagDefaults($arr, $options=null) {
+		
+		$options = PowerSet::def($options,array(
+			'tagKey' => 'tag',
+			'textKey' => 'text'
+		));
+		
 		// search for a last non-associative value for the config array to be used as text or sub-tags
-		if ( !array_key_exists('text', $options) ) {
-			if ( gettype(array_pop(array_keys($options))) === 'integer' ) {
-				$options['text'] = array_pop($options);
+		if ( !array_key_exists($options['textKey'], $arr) ) {
+			if ( gettype(array_pop(array_keys($arr))) === 'integer' ) {
+				$arr[$options['textKey']] = array_pop($arr);
 			}
 		}
 		
 		// apply tag's defaults
-		$options = PowerSet::extend(array(
-			'tag' => null,
-			'text' => null,
-		),$options);
+		$arr = PowerSet::extend(array(
+			$options['tagKey'] => null,
+			$options['textKey'] => null,
+		),$arr);
 		
-		return $options;
+		return $arr;
 	}
 	
 	
@@ -609,7 +637,11 @@ class PowerHtmlHelper extends HtmlHelper {
 	/**
 	 * Global accessible method to set default values for a tag() options array.
 	 * transform a string value into a "style" or "class" attribute depending on string
-	 * content
+	 * content.
+	 * 
+	 * array() -> array( 'id'=>'', 'class'=>'', 'style'=>'' )
+	 * 'foo' -> array( 'id'=>'', 'class'=>'foo', 'style'=>'' )
+	 * 'color:red' -> array( 'id'=>'', 'class'=>'', 'style'=>'color:red' )
 	 * 
 	 */
 	public static function tagOptions( $arr = '', $defaultValues = null, $options = array() ) {
@@ -673,6 +705,8 @@ class PowerHtmlHelper extends HtmlHelper {
 	 * @param array $tags
 	 */
 	public function tags( $tags = array() ) {
+		
+		trigger_error('tags() is now deprecated and will be removed soon!', E_USER_WARNING ); 
 		
 		$html = '';
 		
