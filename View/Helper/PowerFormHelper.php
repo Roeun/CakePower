@@ -175,5 +175,52 @@ class PowerFormHelper extends FormHelper {
 		return parent::error( $field, $message, $options );
 
 	}
+	
+	
+	
+	
+	
+	
+	
+// --------------------------- //
+// ---[[   X T Y P E S   ]]--- //
+// --------------------------- //
+	
+	public function xtypeInput($mode, $name, $text, $options) {
+		switch ($mode) {
+			case 'options':
+				$options['allowEmpty'] = true;
+				if (isset($options['name'])) {
+					$name = $options['name'];
+					unset($options['name']);
+				} elseif (!empty($text)) {
+					$name = $text;
+				}
+				return array($name, $text, $options);
+			case 'tag':
+				return $this->input($name, $options);
+		}
+	}
+	
+	public function xtypeInputs($mode, $name, $text, $options) {
+		switch ($mode) {
+			case 'options':
+				$options['autoRender'] = false;
+				return array($name, $text, $options);
+			case 'tag':
+				$inputs = array();
+				foreach ( $text as $field ) {
+					$field = $this->Html->atagDefaults($field);
+					if (empty($field['name']) && !empty($field['text'])) {
+						$field['name'] = $field['text'];
+					}
+					if (empty($field['name'])) continue;
+					$inputs[$field['name']] = PowerSet::clear($field,array('teg','text','name','xtype'));
+				}
+				return $this->inputs($inputs);
+		}
+	}
+	
+	
 
 }

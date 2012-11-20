@@ -52,7 +52,7 @@ class PowerHtmlHelper extends HtmlHelper {
 	 * 
 	 * @var array
 	 */
-	protected $_allowedAttributes = array(
+	public static $allowedAttributes = array(
 		'id',
 		'class',
 		'style',
@@ -410,6 +410,7 @@ class PowerHtmlHelper extends HtmlHelper {
 		$options = $this->tagOptions($options, array(
 			'xtype' => 'tag',
 			'allowEmpty' => 'span,td,th,i,b,img,input',
+			'autoRender' => true,
 			'if' => true,
 			'else' => null,
 		));
@@ -418,12 +419,9 @@ class PowerHtmlHelper extends HtmlHelper {
 		$xtype = $options['xtype'];
 		$options = PowerSet::clear($options, 'xtype');
 		
-		// apply Xtype configuration
-		list ($name, $text, $options) = $this->xtypeOptions($xtype, $name, $text, $options); 
-		
-		// check for empty value to be cleared:
-		if ( empty($text) && ( $options['allowEmpty'] == false || strpos($options['allowEmpty'], $name) === false ) ) {
-			return;	
+		// apply Xtype configuration callback
+		if ( ($xtypeOptions = $this->_xtypeOptions($xtype, $name, $text, $options)) !== null) {
+			list($name, $text, $options) = $xtypeOptions; 
 		}
 		
 		// handle conditional tag option:
@@ -446,19 +444,26 @@ class PowerHtmlHelper extends HtmlHelper {
 			}
 		}
 		
+		// apply sub-tags
+		if (is_array($text) && $options['autoRender'] === true) {
+			$text = $this->atag($text);
+		}
+		
+		// check for empty value to be cleared:
+		if ( empty($text) && ( $options['allowEmpty'] == false || strpos($options['allowEmpty'], $name) !== false ) ) {
+			return;	
+		}
+		
+		// clear options array
 		$options = PowerSet::clear($options, array(
 			'allowEmpty',
+			'autoRender',
 			'if',
 			'else'
 		));
 		
-		// apply sub-tags
-		if ( is_array($text) ) {
-			$text = $this->atag($text);
-		}
-		
-		// apply xtype content
-		$xtype = $this->xtypeTag($xtype, $name, $text, $options);
+		// apply xtype content callback
+		$xtype = $this->_xtypeTag($xtype, $name, $text, $options);
 		if (is_string($xtype)) {
 			return $xtype;
 		}
@@ -471,35 +476,56 @@ class PowerHtmlHelper extends HtmlHelper {
 		
 	}
 	
-	protected function xtypeOptions($xtype, $name, $text, $options) {
-		
-		switch ($xtype) {
-			case 'link':
-				if (isset($options['show'])) {
-					$text = $options['show'];
-					unset($options['show']);
+	protected function _xtypeOptions($xtype, $name, $text, $options) {
+		foreach ($this->_xtypeGetContext() as $helper=>$xtypes) {
+			if (isset($xtypes[$xtype])) {
+				if (($tmp = $this->_View->$helper->$xtypes[$xtype]('options', $name, $text, $options)) !== null) {
+					return $tmp;
 				}
-				break;
-			case 'image':
-				$name = 'img';
-				break;
-				
+			}
+		}
+	}
+	
+	protected function _xtypeTag($xtype, $name, $text, $options) {
+		foreach ($this->_xtypeGetContext() as $helper=>$xtypes) {
+			if (isset($xtypes[$xtype])) {
+				if (($tmp = $this->_View->$helper->$xtypes[$xtype]('tag', $name, $text, $options)) !== null) {
+					return $tmp;
+				}
+			}
+		}
+	}
+	
+	protected function _xtypeGetContext() {
+		
+		// return a cached version of xtype view context
+		if (!empty($this->_xtypeContext)) {
+			return $this->_xtypeContext;
 		}
 		
-		return array($name, $text, $options);
+		// build view context
+		$this->_xtypeContext = array();
+		foreach ($this->_View as $prop=>$val) {
+			if (is_object($this->_View->$prop) && is_subclass_of($this->_View->$prop,'Helper')) {
+				$this->_xtypeContext[$prop] = array();
+				foreach (get_class_methods($this->_View->$prop) as $method) {
+					if (substr($method, 0, 5) == 'xtype') {
+						$xtype = Inflector::underscore(substr($method, 5, strlen($method)));
+						$this->_xtypeContext[$prop][$xtype] = substr($method, 0, strlen($method));
+					}
+				}
+			}
+			if (empty($this->_xtypeContext[$prop])) {
+				unset($this->_xtypeContext[$prop]);
+			}
+		}
+		
+		#ddebug($this->_xtypeContext);
+		return $this->_xtypeContext;
 		
 	}
 	
-	protected function xtypeTag($xtype, $name, $text, $options) {
-		
-		switch ($xtype) {
-			case 'link':
-				return $this->link($text, $options['url'], $this->filterValidTagOptions(PowerSet::clear($options, 'url')));
-			case 'image':
-				return $this->image($options['src'], $this->filterValidTagOptions(PowerSet::clear($options, 'src')));
-		}
-		
-	}
+	
 	
 	protected function solveTagConditional($name, $text, $options) {
 		
@@ -530,20 +556,9 @@ class PowerHtmlHelper extends HtmlHelper {
 		}
 		
 		// direct configuration array
-		if ( array_key_exists('xtype', $options) || array_key_exists('tag', $options) || array_key_exists('text', $options) ) {
+		if ( array_key_exists('xtype', $options) || array_key_exists('tag', $options) || array_key_exists('text', $options) || array_key_exists('id', $options) || array_key_exists('class', $options) || array_key_exists('style', $options) ) {
 			
-			// search for a last non-associative value for the config array to be used as text or sub-tags
-			if ( !array_key_exists('text', $options) ) {
-				if ( gettype(array_pop(array_keys($options))) === 'integer' ) {
-					$options['text'] = array_pop($options);
-				}
-			}
-			
-			// apply tag's defaults
-			$options = PowerSet::extend(array(
-				'tag' => null,
-				'text' => null,
-			),$options);
+			$options = $this->atagDefaults($options);
 			
 			// apply standard params tag method
 			return $this->tag($options['tag'], $options['text'], PowerSet::clear($options, array('tag','text')));
@@ -568,205 +583,27 @@ class PowerHtmlHelper extends HtmlHelper {
 		
 	} 
 	
-	
-	
-	
-/**
- * tag()
- * ------------------------------------
- * add possibility to nest multiple tags inside $text property.
- * 
- * // The CakePHP way:
- * $text = 'This is a ';
- * $text.= $this->Html->link( 'link', 'http://cakepower.org' );
- * echo $this->Html->tag( 'p', $text );
- * 
- * // The CakePower way:
- * echo $this->Html->tag( 'p', array(
- *     'This is a ',
- *     $this->Html->link( 'link', 'http://cakepower.org' )
- * ));
- * 
- * You can nest how many declarations as you wish/need containing code verbosity of
- * declarate many temporary vars!
- * 
- * // Full array configuration:
- * echo $this->Html->tag(array(
- * 		'name' 	=> 'div',
- * 		'class' => 'class1 class2',
- * 		'id'	=> 'tag-id',
- * 		'content' => array(
- * 			'row1',
- * 			$this->Html->link( .. ),
- * 			'another content',
- *  		$this->Html->tag( 'p', 'test' ) // nested tag
- * 		)
- * ));
- * 
- * 
- * @param unknown_type $name
- * @param unknown_type $text
- * @param unknown_type $options
- */	
-	public function __tag( $name='div', $text = null, $options = array()) {
-		
-		
-		// -- XTYPE --
-		if ( is_array($name) && array_key_exists('xtype', $name) ) {
-			
-			$xtype = null;
-			if ( isset($name['xtype']) ) {
-				$xtype = $name['xtype'];
-				unset($name['xtype']);
-			}
-			
-			switch($xtype) {
-				case 'link':
-					$name = PowerSet::extend(array(
-						'data-xtype' => 'link',
-						'show' => '',
-						'url' => array()
-					),$name);
-					return $this->link($name['show'], $name['url'], PowerSet::clear($name, array('show', 'url')));
-			}
-			
-		}
-		// -- XTYPE --
-		
-		
-		// Handle a full vector notation to be converted into a list of tags
-		if ( is_array($name) && PowerSet::is_vector($name) ) return $this->tags($name);
-		
-		// Full array configuration.
-		// allow to set up every option in a single array.
-		if ( is_array($name) ) {
-			
-			$name += array( 'name'=>'div', 'content'=>'', 'options'=>array() );
-			
-			$tagName = $name['name'];
-			unset($name['name']);
-			
-			$content = $name['content'];
-			unset($name['content']);
-			
-			$name = PowerSet::merge( $name, $name['options'] );
-			unset($name['options']);
-			
-			return $this->tag( $tagName, $content, $name );
-			
-		} 
-		
-		// Default handled options
-		if ( !is_array($options) ) $options = array();
-		$options+= array( 'if'=>true, 'else'=>'', 'allowEmpty'=>'span,td,th,i,b' );
-		
-		// Handle conditional output and conditional content.
-		// the "else" key will replace the content with "else" value.
-		// if no "else" key is provided no output is sent back to the client!
-		if ( !$options['if'] ) {
-			if ( !empty($options['else']) ) {
-				$text = $options['else'];
-				
-			} else {
-				return;
-				
-			}	
-		}
-		unset($options['if']);
-		unset($options['else']);
-		
-		
-		
-		// Compose the tag content form an array value.
-		if ( is_array($text) ) {
-			
-			// Allow to direct chain multiple arrays:
-			// array(
-			//   'name' => 'li',
-			//   'content' => array(
-			//      'name' => 'a',
-			//      'content' => 'test'
-			//   )
-			// )
-			//
-			// it translates a direct array content to a row of array contents as expected by the rest of the procedure.
-			if ( isset($text['xtype']) || isset($text['content']) || isset($text['name']) || isset($text['class']) || isset($text['id']) ) $text = array( $text );
-			
-			$_text = $text;
-			
-			$text = '';
-			
-			foreach ( $_text as $item ) {
-				
-				// Apply default "tag()" method to internal configuration-only item.
-				// this allow to write something like:
-				// echo $this->Html->tag(array(
-				//     'name' => 'div',
-				//     'content' => array(
-				//          array( 'name'=>'p', 'content'=>'foo1' ),
-				//          array( 'name'=>'div', 'content'=>'foo2 )
-				//     )
-				//))
-				if ( is_array($item) ) {
-					$item = $this->tag( $item );
-				}
-				
-				// simple strings are quequed to the tag text!
-				$text.= $item;
-			
-			}
-			
-		}
-		
-		
-		
-		// Handle the tag based "allowEmpty" and translates to true/false
-		if ( is_string($options['allowEmpty']) ) if ( strpos($options['allowEmpty'],$name) !== false ) $options['allowEmpty'] = true; else $options['allowEmpty'] = false;
-		
-		// Handle the "allowEmpty" option [true/false]
-		if ( $options['allowEmpty'] === false && empty($text) ) return;
-		unset($options['allowEmpty']);
-		
-		
-		
-		// Prevent blank attributes to be appended to the HTML
-		if ( empty($options['class']) ) 		unset($options['class']);
-		if ( empty($options['id']) ) 			unset($options['id']);
-		if ( empty($options['style']) ) 		unset($options['style']);
-		
-		// filters non standard attributes
-		foreach ( $options as $key=>$val ) {
-			if ( !$this->isValidTagOption($key) ) unset($options[$key]);
-		}
-		
-		// Use the CakePHP's parent method to output the HTML source.
-		return parent::tag( $name, $text, $options );
-	
-	}
-	
-	/**
-	 * Define if a tag option name is allowd inside the tag() method
-	 * @param unknown_type $key
-	 */
-	protected function isValidTagOption($key) {
-		
-		// filter allowed attributes
-		if ( in_array($key,$this->_allowedAttributes) ) return true;
-		
-		// allow all data- attributes
-		if ( substr($key,0,5) === 'data-' ) return true;
-		
-		return false;
-	}
-	
-	protected function filterValidTagOptions($options) {
-		foreach ($options as $key=>$val) {
-			if (!$this->isValidTagOption($key)) {
-				unset($options[$key]);	
+	public function atagDefaults($options) {
+		// search for a last non-associative value for the config array to be used as text or sub-tags
+		if ( !array_key_exists('text', $options) ) {
+			if ( gettype(array_pop(array_keys($options))) === 'integer' ) {
+				$options['text'] = array_pop($options);
 			}
 		}
+		
+		// apply tag's defaults
+		$options = PowerSet::extend(array(
+			'tag' => null,
+			'text' => null,
+		),$options);
+		
 		return $options;
 	}
+	
+	
+	
+	
+	
 	
 	
 	/**
@@ -802,6 +639,32 @@ class PowerHtmlHelper extends HtmlHelper {
 		return PowerSet::def($arr, $defaultValues, $options['txtAttr']);
 	
 	}
+	
+	/**
+	 * Define if a tag option name is allowd inside the tag() method
+	 * @param unknown_type $key
+	 */
+	public static function isValidTagOption($key) {
+		
+		// filter allowed attributes
+		if ( in_array($key,self::$allowedAttributes) ) return true;
+		
+		// allow all data- attributes
+		if ( substr($key,0,5) === 'data-' ) return true;
+		
+		return false;
+	}
+	
+	public static function filterValidTagOptions($options) {
+		foreach ($options as $key=>$val) {
+			if (!self::isValidTagOption($key)) {
+				unset($options[$key]);	
+			}
+		}
+		return $options;
+	}
+	
+	
 	
 	
 	/**
@@ -1230,7 +1093,33 @@ class PowerHtmlHelper extends HtmlHelper {
 	}
 	
 	
+// --------------------------- //
+// ---[[   X T Y P E S   ]]--- //
+// --------------------------- //
 	
+	public function xtypeLink($mode, $name, $text, $options) {
+		switch ($mode) {
+			case 'options':
+				if (isset($options['show'])) {
+					$text = $options['show'];
+					unset($options['show']);
+				}
+				return array($name, $text, $options);
+			case 'tag':
+				return $this->link($text, $options['url'], $this->filterValidTagOptions(PowerSet::clear($options, 'url')));
+		}
+	}
+	
+	
+	public function xtypeImage($mode, $name, $text, $options) {
+		switch ($mode) {
+			case 'options':
+				$name = 'img';
+				return array($name, $text, $options);
+			case 'tag':
+				return $this->image($options['src'], $this->filterValidTagOptions(PowerSet::clear($options, 'src')));
+		}
+	}
 	
 	
 	
