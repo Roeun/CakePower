@@ -451,7 +451,7 @@ class PowerHtmlHelper extends HtmlHelper {
 		
 		// check for empty value to be cleared:
 		if ( empty($text) && $options['allowEmpty'] !== true ) {
-			if (strpos($options['allowEmpty'], $name) === false) return;
+			if (!in_array($name, explode(',', $options['allowEmpty']))) return;
 		}
 		
 		// clear options array
@@ -935,11 +935,7 @@ class PowerHtmlHelper extends HtmlHelper {
 		unset($options['tagName']);
 		
 		// return the block
-		return $this->tag(array(
-			'name' 		=> $tagName,
-			'content'	=> $content,
-			'options'	=> $options
-		));
+		return $this->tag($tagName, $content, $options);
 	
 	}
 	

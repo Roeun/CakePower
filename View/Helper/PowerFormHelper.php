@@ -185,6 +185,44 @@ class PowerFormHelper extends FormHelper {
 // --------------------------- //
 // ---[[   X T Y P E S   ]]--- //
 // --------------------------- //
+
+	public function xtypeForm($mode, $name, $text, $options) {
+		switch ($mode) {
+			case 'options':
+				$options['allowEmpty'] = true;
+				if (isset($options['model'])) {
+					$name = $options['model'];
+				} elseif (isset($options['name'])) {
+					$name = $options['name'];
+				}
+				$options = PowerSet::extend(array(
+					'actions' => null,
+					'end' => null
+				),$options);
+				return array($name, $text, $options);
+			case 'tag':
+				// fetch ending blocks
+				$actions = $options['actions'];
+				$end = $options['end'];
+				// form rendered blocks
+				$form = $this->create($name, PowerSet::clear($options, array('model', 'name', 'actions', 'end')));
+				$form.= $text;
+				$form.= $this->end($end);
+				return $form;
+		}
+	}
+	
+	public function xtypeFormEnd($mode, $name, $text, $options) {
+		switch ($mode) {
+			case 'options':
+				$options['allowEmpty'] = true;
+				$options['autoRender'] = false;
+				break;
+			case 'tag':
+				return $this->end($text);
+		}
+	}
+	
 	
 	public function xtypeInput($mode, $name, $text, $options) {
 		switch ($mode) {
