@@ -544,27 +544,27 @@ class PowerHtmlHelper extends HtmlHelper {
 		
 		// retro-compatibility notation
 		// may trigger a warning to alert that these keywords may not exists anymore!
-		if (isset($options['name']) || isset($options['content'])) {
+		if (isset($options['name']) || isset($options['text'])) {
 			
 			if (isset($options['name'])) {
 				#trigger_error('PowerHtmlHelper::atag() "name" key is now deprecated!', E_USER_WARNING );
 				$options['tag'] = $options['name'];
 				unset($options['name']);
 			}
-			if (isset($options['content'])) {
+			if (isset($options['text'])) {
 				#trigger_error('PowerHtmlHelper::atag() "content" key is now deprecated!', E_USER_WARNING );
-				$options['text'] = $options['content'];
-				unset($options['content']);
+				$options['content'] = $options['text'];
+				unset($options['text']);
 			}
 		}
 		
 		// direct configuration array
-		if ( array_key_exists('xtype', $options) || array_key_exists('tag', $options) || array_key_exists('text', $options) || array_key_exists('id', $options) || array_key_exists('class', $options) || array_key_exists('style', $options) ) {
+		if ( array_key_exists('xtype', $options) || array_key_exists('tag', $options) || array_key_exists('content', $options) || array_key_exists('id', $options) || array_key_exists('class', $options) || array_key_exists('style', $options) ) {
 			
 			$options = $this->atagDefaults($options);
 			
 			// apply standard params tag method
-			return $this->tag($options['tag'], $options['text'], PowerSet::clear($options, array('tag','text')));
+			return $this->tag($options['tag'], $options['content'], PowerSet::clear($options, array('tag','content')));
 		
 		// list of sub-tags, generates a string as output.
 		// tag configuration items will be translated to tags, strings or other format will be appended as thei are. 
@@ -609,7 +609,7 @@ class PowerHtmlHelper extends HtmlHelper {
 		
 		$options = PowerSet::def($options,array(
 			'tagKey' => 'tag',
-			'textKey' => 'text'
+			'textKey' => 'content'
 		));
 		
 		// search for a last non-associative value for the config array to be used as text or sub-tags

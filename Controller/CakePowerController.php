@@ -131,38 +131,36 @@ class CakePowerController extends Controller {
  * Use these methods in your controller's __construct() method
  */
 	
-	public function addLib( $type, $name, $config = array(), $override = true ) {
-		
-		if ( !empty($this->{$type}[$name]) && $override !== true ) return false;
-		
+	public function addLib($type, $name, $config = array(), $override = true) {
+		$this->{$type} = PowerSet::def($this->{$type});
+		if (!empty($this->{$type}[$name]) && $override !== true) return false;
 		$this->{$type}[$name] = $config;
-		
 		return true;
-	
 	}
 	
-	public function addHelper( $name, $config = array(), $override = true ) {
-		
-		return $this->addLib( 'helpers', $name, $config, $override );
-		
+	public function addHelper($name, $config = array(), $override = true) {
+		return $this->addLib('helpers', $name, $config, $override);
 	}
 	
-	public function addComponent( $name, $config = array(), $override = true ) {
-		
-		return $this->addLib( 'components', $name, $config, $override );
-		
+	public function addComponent($name, $config = array(), $override = true) {
+		return $this->addLib('components', $name, $config, $override);
 	}
 	
-	public function addModel( $name, $config = array(), $override = true ) {
-		
-		if ( !in_array( $name, $this->uses) ) $this->uses[] = $name;
-		
+	public function addBehavior($name, $config = array(), $override = true) {
+		return $this->addLib('behaviors', $name, $config, $override);
 	}
 	
-	public function addBehavior( $name, $config = array(), $override = true ) {
-		
-		return $this->addLib( 'behaviors', $name, $config, $override );
-		
+	
+	/**	
+	 * Appends a model to the $uses key of the controller
+	 * 
+	 * @param string $name
+	 */
+	public function addModel($name) {
+		$this->uses = PowerSet::def($this->uses);
+		if (!in_array($name, $this->uses)) {
+			$this->uses[] = $name;	
+		}
 	}
 	
 	

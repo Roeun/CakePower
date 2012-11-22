@@ -223,7 +223,6 @@ class PowerFormHelper extends FormHelper {
 		}
 	}
 	
-	
 	public function xtypeInput($mode, $name, $text, $options) {
 		switch ($mode) {
 			case 'options':
