@@ -37,10 +37,10 @@ class CakePowerComponent extends Component {
 /**	
  * Import a model into component namespace
  */
-	protected function loadModel( $model ) {
+	protected function loadModel($model) {
 		
 		// Search for a model instance from the controller
-		if ( isset($this->Controller->$model) && $this->Controller->$model instanceof Model ) {
+		if ( isset($this->Controller->$model) && $this->Controller->$model instanceof Model) {
 			$this->$model = $this->Controller->$model;
 		
 		// Load model from registry
@@ -48,7 +48,8 @@ class CakePowerComponent extends Component {
 			$this->$model = ClassRegistry::init($model);	
 			
 		}
-	
+		
+		return $this->$model;
 	}
 	
 	

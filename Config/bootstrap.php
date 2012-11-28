@@ -144,7 +144,7 @@ PowerConfig::set(array(
 		
 		// Some info about the window url location fetched from the server side info
 		'location' => array(
-			
+			'root'		=> powerSelfProtocol() . '://' . powerSelfHost() . powerSelfPort() . Router::url('/'),
 			'href' 		=> powerSelfHref(),
 			'url'		=> powerSelfUrl(),
 			'search'	=> powerSelfSearch()
@@ -190,8 +190,6 @@ PowerConfig::set(array(
 	),
 
 ));
-
-
 
 
 

@@ -116,7 +116,7 @@ function powerSelfPort() {
 	// these info are not available to SHELL!
 	if ( empty($_SERVER["SERVER_PORT"]) ) return;
 	
-	return ($_SERVER["SERVER_PORT"] == "80") ? "" : (":".$_SERVER["SERVER_PORT"]);
+	return ($_SERVER["SERVER_PORT"] == 80) ? '' : (':'.$_SERVER["SERVER_PORT"]);
 	
 }
 

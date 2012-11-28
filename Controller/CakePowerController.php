@@ -22,7 +22,7 @@
 App::uses('Controller', 'Controller');
 
 // Lazy loads the CakePowerComponent
-App::uses( 'CakePowerComponent', 'CakePower.Controller/Component' );
+App::uses('CakePowerComponent', 'CakePower.Controller/Component');
 
 class CakePowerController extends Controller {
 	
@@ -51,25 +51,9 @@ class CakePowerController extends Controller {
 		// Automagically loads CakePower's Auth Component Layer
 		if ( isset($this->components['Auth']) ) $this->__cakePower['components']['Auth'] = true;
 		
-		// Loads extended core classes setting an alias to use them with the normal app names.
-		foreach( array('components','helpers') as $type ) {
-			
-			foreach ( $this->__cakePower[$type] as $key=>$val ) {
-				
-				if ( is_numeric($key) ) {
-					$cmp 	= $val;
-					$load 	= true;
-				} else {
-					$cmp 	= $key;
-					$load 	= $val;
-				}
-				
-				if ( empty($this->{$type}[$cmp]) && $load === true ) $this->{$type}[$cmp] = array();
-				if ( isset($this->{$type}[$cmp]) && empty($this->{$type}[$cmp]['className']) ) $this->{$type}[$cmp]['className'] = 'CakePower.Power'.$cmp;
-				
-			}
-			
-		}
+		// Alias CakePower libraries
+		$this->aliasLibs('components', $this->__cakePower['components'], 'CakePower.Power');
+		$this->aliasLibs('helpers', $this->__cakePower['helpers'], 'CakePower.Power');
 		
 		// Add a is('rest') detector to the request object.
 		// detecting a REST request is responsibility of the PowerApp class!
@@ -97,7 +81,8 @@ class CakePowerController extends Controller {
 		
 		// Set request params to the global access configuration to allow an easy access.
 		PowerConfig::set( 'request.params', $this->request->params );
-		PowerConfig::set( 'request.data', 	$this->request->data ) ;
+		PowerConfig::set( 'request.data', 	$this->request->data );
+		
 		
 		// TMP: here will be listed controller's services...
 		foreach ( $this->methods as $i=>$val ) {
@@ -121,7 +106,42 @@ class CakePowerController extends Controller {
 		
 	}
 	
-
+	
+	/**
+	 * Alias a list of libraries to specific classNames.
+	 * 
+	 * Pretend you realized your custom FooHtmlHelper that extends CakePHP's core HtmlHelper.
+	 * If you want to use your class without change View API you need to alias 
+	 * 
+	 * View's Html helper to your custom class:
+	 *     $this->aliasLib('helpers','Html,'Foo')
+	 * 
+	 * or a custom class from a plugin:
+	 *     $this->aliasLib('helpers','Html,'CustomPlugin.Foo')
+	 * 
+	 * 
+	 * @param string $type library type [helpers|components|behaviors]
+	 * @param array $list [Html,Session,Auth,...]
+	 * @param string $prefix [CakePower.Power|CakePanel.Panel|...]
+	 */
+	protected function aliasLibs($type, $list, $prefix = '') {
+		if (is_string($list)) {
+			$list = array($list);
+		}
+		foreach ($list as $key=>$val) {
+			if ( is_numeric($key) ) {
+				$cmp 	= $val;
+				$load 	= true;
+			} else {
+				$cmp 	= $key;
+				$load 	= $val;
+			}
+			
+			if ( empty($this->{$type}[$cmp]) && $load === true ) $this->{$type}[$cmp] = array();
+			if ( isset($this->{$type}[$cmp]) && empty($this->{$type}[$cmp]['className']) ) $this->{$type}[$cmp]['className'] = $prefix.$cmp;
+		}
+	}
+	
 	
 	
 	

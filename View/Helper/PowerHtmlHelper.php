@@ -61,7 +61,9 @@ class PowerHtmlHelper extends HtmlHelper {
 		'alt',
 		'src',
 		'href',
-		'name'
+		'name',
+		'action',
+		'method'
 	);
 	
 	
