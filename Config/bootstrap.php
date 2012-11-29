@@ -286,7 +286,6 @@ if ( !empty($plugins) ) $plugins = Set::sort( $plugins, '{n}.order', 'asc' );
 
 
 
-
 // Load Plugins and write PowerConfig database.
 foreach ( $plugins as $plugin ) {
 	

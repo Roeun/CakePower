@@ -38,6 +38,14 @@ class PowerEventListener implements CakeEventListener {
 	public $name 				= '';
 	
 	
+	
+	
+/**	
+ * Implemented Events Priority
+ * ===========================
+ */
+	public $priority = 100;
+	
 /**	
  * Implemented Events List
  * =======================
@@ -64,6 +72,8 @@ class PowerEventListener implements CakeEventListener {
  * 
  */
 	public $events 				= array(); // eventName => methodName map
+	
+	
 	
 	
 /**	
@@ -238,6 +248,19 @@ class PowerEventListener implements CakeEventListener {
 				$method = PowerString::tpl( $event, $this->_methodReplace, $this->_swipeReplace );
 				$method = lcfirst(Inflector::camelize(str_replace('.','_',$method)));
 			
+			// Apply priority as numeric value for a single event
+			} elseif (is_int($method)) {
+				$priority = $method;
+				
+				$method = PowerString::tpl( $event, $this->_methodReplace, $this->_swipeReplace );
+				$method = lcfirst(Inflector::camelize(str_replace('.','_',$method)));
+			
+			// Custom method and optional custom priority
+			} elseif(is_array($method)) {
+				$method = PowerSet::def($method,array('callable'=>'','priority'=>$this->priority));
+				$priority = $method['priority'];
+				$method = $method['callable'];
+				
 			// Method was given as a value for the event key
 			} else {
 				$method = PowerString::tpl( $method, $this->_methodReplace, $this->_swipeReplace );
@@ -249,7 +272,10 @@ class PowerEventListener implements CakeEventListener {
 			$this->events[$event] 		= $method;
 			$this->methods[$method]		= $event;
 			
-			$implementedEvents[$event]	= '__evt__' . $method;
+			// apply the array version with basic priority applied
+			$implementedEvents[$event]	= PowerSet::extend(array(
+				'priority' => isset($priority)?$priority:$this->priority,
+			), PowerSet::def('__evt__'.$method, null, 'callable'));
 		}
 		
 		#debug($this->events);
