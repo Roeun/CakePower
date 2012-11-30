@@ -51,7 +51,7 @@ class PowerFormHelper extends FormHelper {
 	 */
 
 	public function create( $model = '', $options = array() ) {
-
+		
 		$options += array(
             'class'			=> '',
         	'style'			=> '',
@@ -190,6 +190,7 @@ class PowerFormHelper extends FormHelper {
 		switch ($mode) {
 			case 'options':
 				$options['allowEmpty'] = true;
+				$options['autoRender'] = false;
 				if (isset($options['model'])) {
 					$name = $options['model'];
 				} elseif (isset($options['name'])) {
@@ -205,9 +206,9 @@ class PowerFormHelper extends FormHelper {
 				$actions = $options['actions'];
 				$end = $options['end'];
 				// form rendered blocks
-				$form = $this->_View->Form->create($name, PowerSet::clear($options, array('model', 'name', 'actions', 'end')));
-				$form.= $text;
-				$form.= $this->_View->Form->end($end);
+				$form = $this->create($name, PowerSet::clear($options, array('model', 'name', 'actions', 'end')));
+				$form.= $this->Html->tag($text);
+				$form.= $this->end($end);
 				return $form;
 		}
 	}
@@ -219,7 +220,7 @@ class PowerFormHelper extends FormHelper {
 				$options['autoRender'] = false;
 				break;
 			case 'tag':
-				return $this->_View->Form->end($text);
+				return $this->end($text);
 		}
 	}
 	
@@ -235,7 +236,7 @@ class PowerFormHelper extends FormHelper {
 				}
 				return array($name, $text, $options);
 			case 'tag':
-				return $this->_View->Form->input($name, $options);
+				return $this->input($name, $options);
 		}
 	}
 	
@@ -254,7 +255,7 @@ class PowerFormHelper extends FormHelper {
 					if (empty($field['name'])) continue;
 					$inputs[$field['name']] = PowerSet::clear($field,array('teg','text','name','xtype'));
 				}
-				return $this->_View->Form->inputs($inputs);
+				return $this->inputs($inputs);
 		}
 	}
 	

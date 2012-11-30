@@ -395,7 +395,7 @@ class PowerHtmlHelper extends HtmlHelper {
 
 
 	public function tag($name=null, $text=null, $options=array()) {
-
+		
 		if (is_array($name)) {
 			return $this->atag($name);
 		}
