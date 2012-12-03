@@ -229,6 +229,7 @@ class CakePowerController extends Controller {
 	}
 	
 	
+	
 	public function redirect($url, $status = null, $exit = true) {
 		
 		// AJAX Redirect reqest

@@ -198,16 +198,28 @@ class PowerFormHelper extends FormHelper {
 				}
 				$options = PowerSet::extend(array(
 					'actions' => null,
-					'end' => null
+					'end' => null,
+					'fields' => array()
 				),$options);
 				return array($name, $text, $options);
 			case 'tag':
 				// fetch ending blocks
+				$fields = $options['fields'];
 				$actions = $options['actions'];
 				$end = $options['end'];
 				// form rendered blocks
-				$form = $this->create($name, PowerSet::clear($options, array('model', 'name', 'actions', 'end')));
+				$form = $this->create($name, PowerSet::clear($options, array('model', 'name', 'actions', 'end', 'fields')));
+				// form fields
+				foreach ($fields as $fieldName=>$fieldConfig) {
+					if (is_numeric($fieldName)) {
+						$fieldName = $fieldConfig;
+						$fieldConfig = array();
+					}
+					$form.= $this->input($fieldName,$fieldConfig);
+				}
+				// form content
 				$form.= $this->Html->tag($text);
+				// form actions
 				$form.= $this->end($end);
 				return $form;
 		}
