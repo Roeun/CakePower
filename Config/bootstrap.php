@@ -13,6 +13,7 @@
  * 
  */
 
+
 /**
  * CakePower bootstrap.
  *
@@ -49,6 +50,8 @@ App::import( 'Vendor', 'CakePower.PowerString' );
 App::import( 'Vendor', 'CakePower.PowerConfig' );
 App::import( 'Vendor', 'CakePower.PowerMenu' );
 App::import( 'Vendor', 'CakePower.PowerApp' );
+
+
 
 // Models
 App::import( 'Model', 'CakePower.CakePowerModel' );
@@ -226,8 +229,10 @@ $plugins = array();
 foreach ( App::objects('plugins') as $plugin ) {
 	
 	foreach (App::path('plugins') as $path) {
-		
-		if ( is_dir( $path . $plugin ) ) {
+		if (!is_string($plugin)) {
+			continue;
+		}
+		if (is_dir($path.$plugin)) {
 			
 			// Collect plugin's informations.
 			$pluginConfig = array(
@@ -240,23 +245,23 @@ foreach ( App::objects('plugins') as $plugin ) {
 				'order' => 5000,
 			);
 			
-			
 			// CakePower is not being loaded but it's info is quequed as other plugins!
 			if ( $plugin == 'CakePower' ) {		
 				PowerConfig::set( 'plugin.CakePower', $pluginConfig);
 			
 			// Try to auto configure login loading settings.
 			} else {
-			
+				
 				// Look for bootstrap and routes existance to configure CakePlugin::load()
 				if ( file_exists($pluginConfig['_info']['path'] . 'Config' . DS . 'bootstrap.php' )) 	$pluginConfig['_info']['load']['bootstrap'] 	= true;
 				if ( file_exists($pluginConfig['_info']['path'] . 'Config' . DS . 'routes.php' )) 		$pluginConfig['_info']['load']['routes'] 		= true;
-			
+				
 				// Look for a plugin.php configuration file to extend plugin informations.
 				// This file may define a $config array to be merged with the actual plugin's informations.
 				if ( file_exists($pluginConfig['_info']['path'] . 'Config' . DS . 'plugin.php' )) {
 					
 					$plugin = array();
+					
 					require_once($pluginConfig['_info']['path'] . 'Config' . DS . 'plugin.php');
 					
 					// Extend the load key configuration.
@@ -272,7 +277,6 @@ foreach ( App::objects('plugins') as $plugin ) {
 			
 				$plugins[] = $pluginConfig;
 				
-			
 			}
 			
 		}
@@ -281,10 +285,10 @@ foreach ( App::objects('plugins') as $plugin ) {
 	
 }
 
+
+
 // Sort Plugins to match configuration order.
 if ( !empty($plugins) ) $plugins = Set::sort( $plugins, '{n}.order', 'asc' );
-
-
 
 // Load Plugins and write PowerConfig database.
 foreach ( $plugins as $plugin ) {

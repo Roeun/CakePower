@@ -1191,7 +1191,7 @@ class PowerHtmlHelper extends HtmlHelper {
 				}
 				return array($name, $text, $options);
 			case 'tag':
-				return $this->link($text, $options['url'], $this->filterValidTagOptions(PowerSet::clear($options, 'url')));
+				return $this->link($text, $options['url'], PowerSet::clear($options, 'url'));
 		}
 	}
 

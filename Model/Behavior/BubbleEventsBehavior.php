@@ -46,7 +46,7 @@ class BubbleEventsBehavior extends CakePowerBehavior {
 	
 	}
 	
-	public function beforeDelete( Model $Model ) {
+	public function beforeDelete(Model $Model, $cascade = true) {
 		
 		$this->_reset($Model);
 		
@@ -58,7 +58,7 @@ class BubbleEventsBehavior extends CakePowerBehavior {
 		
 	}
 	
-	public function afterDelete( Model $Model ) {
+	public function afterDelete(Model $Model) {
 		
 		$this->wasDeleted[$Model->alias] = true;
 		

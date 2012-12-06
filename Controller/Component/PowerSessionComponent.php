@@ -159,7 +159,7 @@ class PowerSessionComponent extends SessionComponent {
 	
 /**	
  * AJAX redirect is allowed only in POST and DELETE mode!
- * Client side form may fore a redirect requset by create a "_redirect" true value in _POST or _GET data.
+ * Client side form may force a redirect requset by create a "_redirect" true value in _POST or _GET data.
  */
 	
 	protected function ajaxRedirect( $redirect ) {
@@ -456,7 +456,29 @@ class PowerSessionComponent extends SessionComponent {
 		
 	}
 	
-	public function error( $str, $redirect = array(), $options = array() ) {
+	public function error() {
+		
+		// get params enumeration to fit parent compatible function declaration
+		
+		$args = func_get_args();
+		
+		if (count($args)) {
+			$str = array_shift($args);
+		} else {
+			$str = '';
+		}
+		
+		if (count($args)) {
+			$redirect = array_shift($args);
+		} else {
+			$redirect = array();
+		}
+		
+		if (count($args)) {
+			$options = array_shift($args);
+		} else {
+			$options = array();
+		}
 		
 		// Options boolean type
 		if ( !is_array($options) && is_bool($options) ) $options = array( 'requestData'=>$options );
