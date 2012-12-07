@@ -201,6 +201,9 @@ class PowerConfig {
 		
 		if ( PowerConfig::exists( 'request.data.'.$key ) ) {
 			$val = PowerConfig::get( 'request.data.'.$key );
+
+		} elseif ( PowerConfig::exists( 'request.params.'.$key ) ) {
+			$val = PowerConfig::get( 'request.params.'.$key );
 			
 		} elseif ( PowerConfig::exists( 'request.params.named.'.$key ) ) {
 			$val = PowerConfig::get( 'request.params.named.'.$key );
