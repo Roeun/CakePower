@@ -224,6 +224,8 @@ class PowerHtmlHelper extends HtmlHelper {
 					$url = substr($url, 0, $pos) . 'ccss/' . substr($url, $pos + strlen(CSS_URL));
 				}
 			}
+			
+			
 		}
 
 		if ($rel == 'import') {
@@ -345,6 +347,7 @@ class PowerHtmlHelper extends HtmlHelper {
 			if (Configure::read('Asset.filter.js')) {
 				$url = str_replace(JS_URL, 'cjs/', $url);
 			}
+			
 		}
 
 
@@ -379,7 +382,10 @@ class PowerHtmlHelper extends HtmlHelper {
 
 		// RequireJS DATA-MAIN attribute parsing
 		if ( strpos($url,'require') !== false && isset($options['data-main']) && strpos($options['data-main'],'//') === false ) {
+			$tmp = Configure::read('Asset.version');
+			Configure::write('Asset.version', false);
 			$options['data-main'] = $this->assetUrl($options['data-main'], array('pathPrefix' => $jsUrl.'/', 'ext' => '.js'));
+			Configure::write('Asset.version', $tmp);
 		}
 		/** --CakePOWER-- **/
 
