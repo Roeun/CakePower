@@ -63,7 +63,8 @@ class PowerHtmlHelper extends HtmlHelper {
 		'href',
 		'name',
 		'action',
-		'method'
+		'method',
+		'target',
 	);
 
 
@@ -85,8 +86,26 @@ class PowerHtmlHelper extends HtmlHelper {
 
 
 
-
-
+/**
+ * assetUrl()
+ * Implement "Asset.version" configure options to versionin released assets
+ * and prevent client caches!
+ */
+	public function assetUrl($path, $options = array()) {
+		$url = parent::assetUrl($path, $options);
+		
+		if (Configure::read('Asset.version')) {
+			if (strpos($url, '?') === false) {
+				$url .= '?';
+			} else {
+				$url .= '&';
+			}
+			$url.= 'v=' . Configure::read('Asset.version');
+		}
+		
+		return $url;
+		
+	}
 
 
 /**
@@ -111,7 +130,7 @@ class PowerHtmlHelper extends HtmlHelper {
  *
  */
 	public function css($path, $rel = null, $options = array()) {
-
+		
 		$options += array('block' => null, 'inline' => true);
 
 		if (!$options['inline'] && empty($options['block'])) {
