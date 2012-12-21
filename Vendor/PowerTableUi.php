@@ -333,7 +333,7 @@ class PowerTableUi extends PowerHtmlHelper {
 		}
 		
 		// closure callback
-		if ( isset($this->settings[$callback]) && is_callable($this->text[$callback]) ) {
+		if ( isset($this->settings[$callback]) && is_callable($this->settings[$callback]) ) {
 			$r = $this->settings[$callback]( $settings['text'], $settings, $this );
 			if ( is_array($r) ) $settings = $r; else $settings['text'] = $r;	
 		}
