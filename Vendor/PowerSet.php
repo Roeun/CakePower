@@ -312,9 +312,9 @@ class PowerSet extends Set {
  * 
  */
 	
-	public static function beforeAssoc( $set = array(), $matchKey = '', $newKey = '', $newVal = '' ) {
+	public static function beforeAssoc( $set = array(), $matchKey = '', &$newKey = '', &$newVal = '' ) {
 		
-		if ( !self::_checkBeforeAfterAssoc($set,$matchKey,&$newKey,&$newVal) ) return false;
+		if ( !self::_checkBeforeAfterAssoc($set,$matchKey,$newKey,$newVal) ) return false;
 		//if ( !self::_checkBeforeAfterAssoc($set,$matchKey,$newKey,$newVal) ) return false;
 		
 		$newSet = array();
@@ -336,9 +336,9 @@ class PowerSet extends Set {
 		
 	}
 	
-	public static function afterAssoc( $set = array(), $matchKey = '', $newKey = '', $newVal = '' ) {
+	public static function afterAssoc( $set = array(), $matchKey = '', &$newKey = '', &$newVal = '' ) {
 		
-		if ( !self::_checkBeforeAfterAssoc($set,$matchKey,&$newKey,&$newVal) ) return false;
+		if ( !self::_checkBeforeAfterAssoc($set,$matchKey,$newKey,$newVal) ) return false;
 		//if ( !self::_checkBeforeAfterAssoc($set,$matchKey,$newKey,$newVal) ) return false;
 		
 		$newSet = array();
