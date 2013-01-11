@@ -52,7 +52,7 @@ class PowerString extends String {
 		// mtisi: YES! By encoding and decoding to JSON!
 		$data = json_decode(json_encode($data), true);
 
-		$str = self::insert( $tpl, PowerSet::flatten($data), $options );
+		$str = self::insert($tpl, PowerSet::flatten($data), $options);
 
 		if ( $options['clear'] ) $str = self::stripPlaceholders($str,$options);
 
