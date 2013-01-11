@@ -209,12 +209,32 @@ class PowerSet extends Set {
 		
 	}
 	
-	public static function clear( array $var, $remove = array() ) {
+	
+/**	
+ * Remove a list of array keys from given array.
+ * If $rempove is empty then remove all empty or null values from the array
+ * 
+ * @param array $var
+ * @param unknown_type $remove
+ */
+	public static function clear(array $var, $remove = array()) {
 		
+		// remove null or empty keys
+		if (empty($remove)) {
+			foreach($var as $key=>$val) {
+				if (empty($val)) {
+					unset($var[$key]);
+				}
+			}
+			return $var;
+		}
+		
+		// string preset to a key list
 		if (is_string($remove)) {
 			$remove = array($remove);
 		}
 		
+		// remove named keys
 		foreach ($remove as $key) {
 			unset($var[$key]);
 		}
@@ -321,9 +341,12 @@ class PowerSet extends Set {
 		
 		foreach ( $set as $_key=>$_val ) {
 			
+			// strange notice with some trange characters!
+			ob_start();
 			if ( $_key == $matchKey ) {
 				$newSet[$newKey] = $newVal;	
 			}
+			ob_get_clean();
 			
 			$newSet[$_key] = $_val;
 			

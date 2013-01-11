@@ -373,8 +373,8 @@ class PowerHtmlHelper extends HtmlHelper {
 
 		// decide what js folder to use based on combination on debug status
 		if (
-				( Configure::read('debug') == 0 && !isset($_GET['jsdbg']) && !SessionComponent::check('jsdbg') ) 	// production mode + debug
-			||	( Configure::read('debug') > 0 && ( isset($_GET['jsdbg']) || SessionComponent::check('jsdbg') ) )	// developement mode + production test
+				( Configure::read('debug') == 0 && !isset($_GET['jsdbg']) && !CakeSession::check('jsdbg') ) 	// production mode + debug
+			||	( Configure::read('debug') > 0 && ( isset($_GET['jsdbg']) || CakeSession::check('jsdbg') ) )	// developement mode + production test
 		) $jsUrl .= '-compiled';
 
 		// Replace in-page scripts urls
@@ -641,7 +641,7 @@ class PowerHtmlHelper extends HtmlHelper {
 
 		// search for a last non-associative value for the config array to be used as text or sub-tags
 		if ( !array_key_exists($options['textKey'], $arr) ) {
-			if ( gettype(array_pop(array_keys($arr))) === 'integer' ) {
+			if ( @gettype(array_pop(array_keys($arr))) === 'integer' ) {
 				$arr[$options['textKey']] = array_pop($arr);
 			}
 		}
@@ -763,8 +763,8 @@ class PowerHtmlHelper extends HtmlHelper {
  * It behaves like the original method but using CakePower's tag()
  * all empty tag attributes are cleaned!
  */
-	public function div( $class, $text = null, $options = array()) {
-
+	public function div($class = null, $text = null, $options = array()) {
+	
 		// Support for full-array configuration.
 		if ( is_array($class) ) {
 

@@ -23,7 +23,7 @@ class CakePowerComponent extends Component {
 /**
  * Import a link to the controller
  */
-	public function initialize($controller) {
+	public function initialize(Controller $controller) {
 
 		parent::initialize($controller);
 
