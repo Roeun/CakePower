@@ -313,7 +313,7 @@ class PowerString extends String {
  * Prepends a number of chars (0) at the beginning of a given string.
  * zeroFill( 99, 4 ) -> 0099
  */
-	function zeroFill( $str, $len = 3, $options = array() ) {
+	public static function zeroFill( $str, $len = 3, $options = array() ) {
 
 		// Default options
 		if ( is_bool($options) ) 	$options = array( 'append'	=> $options );
@@ -344,7 +344,7 @@ class PowerString extends String {
  * float2euro utility
  * changes decimal dot sparator to a slash then adds dots as 1/1000 separator
  */
-	function euro( $val = 0 ) {
+	public static function euro( $val = 0 ) {
 		$val = str_replace('.',',',$val);
 		if ( strPos($val,',') !== false ) {
 			$int = subStr($val,0,strPos($val,','));

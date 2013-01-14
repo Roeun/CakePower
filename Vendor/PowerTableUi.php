@@ -106,7 +106,7 @@ class PowerTableUi extends PowerHtmlHelper {
 	 */
 	public function set( $data = null ) {
 		
-		if ( empty($data) ) return;
+		if ( empty($data) ) return false;
 			
 		$this->data = PowerSet::def($data);
 		
@@ -118,7 +118,9 @@ class PowerTableUi extends PowerHtmlHelper {
 	
 	public function render( $data = array() ) {
 		
-		$this->set($data);
+		if ($this->set($data) === false) {
+			return;
+		}
 		
 		$content = array(
 			$this->renderCaption(),
@@ -623,7 +625,8 @@ class PowerTableUi extends PowerHtmlHelper {
 	protected function applyTableSettings( $settings ) {
 		
 		// get the base-class to implement parametri class names
-		$class = array_shift(explode(' ',$settings['table']['class']));
+		$classes = explode(' ',$settings['table']['class']);
+		$class = array_shift($classes);
 		
 		// apply parametric classes
 		foreach ( array('striped','bordered','hover','condensed') as $param ) {
