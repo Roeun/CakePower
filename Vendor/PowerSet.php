@@ -222,7 +222,7 @@ class PowerSet extends Set {
 		// remove null or empty keys
 		if (empty($remove)) {
 			foreach($var as $key=>$val) {
-				if (empty($val)) {
+				if (empty($val) && !is_bool($val)) {
 					unset($var[$key]);
 				}
 			}

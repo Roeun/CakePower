@@ -36,7 +36,6 @@ App::import('Controller/Component', 'AuthComponent');
 
 class PowerAuthComponent extends AuthComponent {
 	
-	
 	/**
 	 * Static Access Denied Page
 	 * You can set an CakePHP url string or array to redirect when a deny exception happen.

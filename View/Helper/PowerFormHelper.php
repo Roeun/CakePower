@@ -57,7 +57,7 @@ class PowerFormHelper extends FormHelper {
         	'style'			=> '',
             'inputDefaults' => array()
 		);
-
+		
 		// Extend form class string
 		if ( !isset($options['overrideClass']) ) {
 
@@ -68,7 +68,7 @@ class PowerFormHelper extends FormHelper {
 			}
 
 		}
-
+		
 		// Extend form style string
 		if ( !isset($options['overrideStyle']) ) {
 			if ( empty($options['style']) ) {
@@ -86,8 +86,8 @@ class PowerFormHelper extends FormHelper {
 		unset($options['overrideStyle']);
 		unset($options['overrideInputDefaults']);
 
-		// array_filter() remove empty params
-		return parent::create($model, array_filter($options) );
+		// remove empty params
+		return parent::create($model, PowerSet::clear($options));
 
 	}
 

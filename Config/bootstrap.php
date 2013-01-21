@@ -51,6 +51,8 @@ App::import( 'Vendor', 'CakePower.PowerConfig' );
 App::import( 'Vendor', 'CakePower.PowerMenu' );
 App::import( 'Vendor', 'CakePower.PowerApp' );
 
+App::uses('PowerNumber', 'CakePower.Vendor');
+
 
 
 // Models

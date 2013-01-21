@@ -344,7 +344,7 @@ class PowerString extends String {
  * float2euro utility
  * changes decimal dot sparator to a slash then adds dots as 1/1000 separator
  */
-	public static function euro( $val = 0 ) {
+	public static function euro($val = 0, $decimals = 2) {
 		$val = str_replace('.',',',$val);
 		if ( strPos($val,',') !== false ) {
 			$int = subStr($val,0,strPos($val,','));
@@ -370,7 +370,7 @@ class PowerString extends String {
 		}
 
 		if ( empty($mill) ) $mill = "0";
-		$dec = substr($dec,0,2);
+		$dec = substr($dec,0,$decimals);
 
 		return $mill.",".self::zeroFill( $dec, 2, true );
 
