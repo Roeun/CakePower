@@ -65,6 +65,7 @@ class PowerHtmlHelper extends HtmlHelper {
 		'action',
 		'method',
 		'target',
+		'type'
 	);
 
 
@@ -93,7 +94,7 @@ class PowerHtmlHelper extends HtmlHelper {
  */
 	public function assetUrl($path, $options = array()) {
 		$url = parent::assetUrl($path, $options);
-		
+
 		if (Configure::read('Asset.version')) {
 			if (strpos($url, '?') === false) {
 				$url .= '?';
@@ -102,9 +103,9 @@ class PowerHtmlHelper extends HtmlHelper {
 			}
 			$url.= 'v=' . Configure::read('Asset.version');
 		}
-		
+
 		return $url;
-		
+
 	}
 
 
@@ -130,7 +131,7 @@ class PowerHtmlHelper extends HtmlHelper {
  *
  */
 	public function css($path, $rel = null, $options = array()) {
-		
+
 		$options += array('block' => null, 'inline' => true);
 
 		if (!$options['inline'] && empty($options['block'])) {
@@ -224,8 +225,8 @@ class PowerHtmlHelper extends HtmlHelper {
 					$url = substr($url, 0, $pos) . 'ccss/' . substr($url, $pos + strlen(CSS_URL));
 				}
 			}
-			
-			
+
+
 		}
 
 		if ($rel == 'import') {
@@ -339,15 +340,18 @@ class PowerHtmlHelper extends HtmlHelper {
 		}
 		$this->_includedScripts[$url] = true;
 
+		$originalUrl = $url;
 
 		if (strpos($url, '//') === false) {
 
-			$url = $this->assetUrl($url, $options + array('pathPrefix' => JS_URL, 'ext' => '.js'));
+			list($plugin, $urlNoPlugin) = pluginSplit($url);
+
+			$url =  $this->assetUrl($originalUrl, $options + array('pathPrefix' => JS_URL, 'ext' => '.js'));
 
 			if (Configure::read('Asset.filter.js')) {
-				$url = str_replace(JS_URL, 'cjs/', $url);
+				$url =  $this->assetUrl($originalUrl, $options + array('pathPrefix' => 'cjs/', 'ext' => '.js'));
 			}
-			
+
 		}
 
 
@@ -359,7 +363,6 @@ class PowerHtmlHelper extends HtmlHelper {
 		 * mechanism to change javascript source files from js/ to js-compiled/ folder.
 		 * this is extremely useful when implement a RequireJS application!
 		 *
-		 * @TODO: check if compiled js folder exists!
 		 *
 		 *
 		/** @@CakePOWER@@ **/
@@ -371,10 +374,17 @@ class PowerHtmlHelper extends HtmlHelper {
 		if ( isset($_GET['jsdbgOn']) ) 	SessionComponent::write('jsdbg',true);
 		if ( isset($_GET['jsdbgOff']) ) SessionComponent::delete('jsdbg');
 
+		if(!is_null($plugin)) {
+			$compiledPath = App::pluginPath($plugin) . WEBROOT_DIR . DS . str_replace('/', '', JS_URL) . '-compiled' . DS . $urlNoPlugin . '.js';
+		} else {
+			$compiledPath = WWW_ROOT . DS . str_replace('/', '', JS_URL) . '-compiled' . DS . $urlNoPlugin . '.js';
+		}
+
 		// decide what js folder to use based on combination on debug status
 		if (
-				( Configure::read('debug') == 0 && !isset($_GET['jsdbg']) && !CakeSession::check('jsdbg') ) 	// production mode + debug
-			||	( Configure::read('debug') > 0 && ( isset($_GET['jsdbg']) || CakeSession::check('jsdbg') ) )	// developement mode + production test
+			(( Configure::read('debug') == 0 && !isset($_GET['jsdbg']) && !CakeSession::check('jsdbg') ) 	// production mode + debug
+			||	( Configure::read('debug') > 0 && ( isset($_GET['jsdbg']) || CakeSession::check('jsdbg') ) ))	// developement mode + production test
+			&& file_exists($compiledPath)
 		) $jsUrl .= '-compiled';
 
 		// Replace in-page scripts urls
@@ -420,7 +430,7 @@ class PowerHtmlHelper extends HtmlHelper {
 
 
 	public function tag($name=null, $text=null, $options=array()) {
-		
+
 		if (is_array($name)) {
 			return $this->atag($name);
 		}
@@ -496,7 +506,7 @@ class PowerHtmlHelper extends HtmlHelper {
 		}
 
 		// filters non standard attributes
-		$options = $this->filterValidTagOptions($options);
+		//$options = $this->filterValidTagOptions($options);
 
 		// Use the CakePHP's parent method to output the HTML source.
 		return parent::tag($name, $text, $options);
@@ -764,7 +774,7 @@ class PowerHtmlHelper extends HtmlHelper {
  * all empty tag attributes are cleaned!
  */
 	public function div($class = null, $text = null, $options = array()) {
-	
+
 		// Support for full-array configuration.
 		if ( is_array($class) ) {
 
@@ -987,59 +997,59 @@ class PowerHtmlHelper extends HtmlHelper {
 
 
 
-	
-/**	
+
+/**
  * Utility method to render a TableUI object with standard or custom (extended) object
- * 
+ *
  *     // view code - custom tableUI object
  *     class myTable extends PanelTableUI { ... }
  *     echo $this->Panel->table( $list, 'myTable' );
- *     
+ *
  *     // view core - generic tableUI with configurations
  *     echo $this->Panel->table( $list, array(
  * 	     'modelName' => 'Foo'
  *     ));
- * 
+ *
  * This method should auto load tableUI class if not present.
  * By default $tableUI is searched inside "Vendor" package but you should customize loading
  * search path as follow:
- * 
+ *
  *     echo $this->Panel->table( $list, 'Plugin.Vendor/customTableObject' );
  *     echo $this->Panel->table( $list, 'Plugin.Vendor/subpackage/customTableObject' );
- * 
- * this kind of $tableUI name will causes: 
- * 
+ *
+ * this kind of $tableUI name will causes:
+ *
  *     App::uses( 'customTableObject', 'Plugin.Vendor' );
  *     App::uses( 'customTableObject', 'Plugin.Vendor/subpackage' );
- *     
- * this approach allow to store 
- * 
+ *
+ * this approach allow to store
+ *
  */
 	public function table( $data, $settings = array() ) {
-		
+
 		if ( isset($data['data']) ) {
 			$settings = $data;
 			$data = $settings['data'];
 			unset($settings['data']);
 		}
-		
+
 		// string settings means custom object
 		if ( is_string($settings) ) $settings = array( 'className'=>$settings );
-		
+
 		// apply defaults to settings
 		if ( !is_array($settings) || empty($settings) ) $options = array();
 		$settings+= array( 'className'=>'' );
-		
+
 		// define and import custom object
 		$className = !empty($settings['className']) ? $settings['className'] : 'CakePower.Vendor/PowerTableUi';
 		list( $className, $package,  ) = packageCmp($className);
 		App::uses( $className, $package );
 		unset($settings['className']);
-		
+
 		// creates table object instance
 		$obj = new $className( $this->_View, $settings );
 		return $obj->render($data);
-		
+
 	}
 
 
@@ -1236,7 +1246,7 @@ class PowerHtmlHelper extends HtmlHelper {
 			case 'options':
 				$options['allowEmpty'] = true;
 				return array($name, $text, $options);
-				
+
 			case 'tag':
 				return $this->table($options);
 		}
