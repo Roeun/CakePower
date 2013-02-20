@@ -1,4 +1,5 @@
 <?php
+
 /**
  * CakePOWER, CREDITS and LICENSING
  * =====================================
@@ -12,36 +13,29 @@
  * Please read "license.txt" document into plugin's root
  *
  */
-
-
-
-
 /**
  * PowerHtmlHelper
  * Extends CakePHP core's HtmlHelper adding usefull features and behaviors.
  */
-
-App::import( 'View/Helper', 'HtmlHelper' );
+App::import('View/Helper', 'HtmlHelper');
 
 
 // Less Support Libraries.
-App::uses('Folder',		'Utility');
-App::uses('File',		'Utility');
-App::uses('Component',	'Controller');
+App::uses('Folder', 'Utility');
+App::uses('File', 'Utility');
+App::uses('Component', 'Controller');
 
 
 // Thrd party libraries
-App::import( 'Vendor', 'CakePower.thrd/lessc' );
-App::import( 'Vendor', 'CakePower.thrd/cssmin' );
+App::import('Vendor', 'CakePower.thrd/lessc');
+App::import('Vendor', 'CakePower.thrd/cssmin');
 
 
 // Less constants.
-if ( !defined('CACHE_LESS') ) 	define( 'CACHE_LESS', CACHE . 'less' . DS );
-if ( !defined('LESS_URL') ) 	define( 'LESS_URL', 'less'.DS );
-
-
-
-
+if(!defined('CACHE_LESS'))
+	define('CACHE_LESS', CACHE . 'less' . DS);
+if(!defined('LESS_URL'))
+	define('LESS_URL', 'less' . DS);
 
 class PowerHtmlHelper extends HtmlHelper {
 
@@ -68,7 +62,6 @@ class PowerHtmlHelper extends HtmlHelper {
 		'type'
 	);
 
-
 	public function __construct(View $View, $settings = array()) {
 
 		// Adds tags to the form helper.
@@ -78,25 +71,21 @@ class PowerHtmlHelper extends HtmlHelper {
 		parent::__construct($View, $settings);
 
 		// Setup Less parsing folders.
-		$this->lessFolder 	= new Folder(WWW_ROOT.'less', true, 0755 );
-		$this->lessCache	= new Folder(CACHE_LESS, true, 0755 );
-		$this->cssFolder 	= new Folder(WWW_ROOT.'css', true, 0755 );
-
+		$this->lessFolder = new Folder(WWW_ROOT . 'less', true, 0755);
+		$this->lessCache = new Folder(CACHE_LESS, true, 0755);
+		$this->cssFolder = new Folder(WWW_ROOT . 'css', true, 0755);
 	}
 
-
-
-
-/**
- * assetUrl()
- * Implement "Asset.version" configure options to versionin released assets
- * and prevent client caches!
- */
+	/**
+	 * assetUrl()
+	 * Implement "Asset.version" configure options to versionin released assets
+	 * and prevent client caches!
+	 */
 	public function assetUrl($path, $options = array()) {
 		$url = parent::assetUrl($path, $options);
 
-		if (Configure::read('Asset.version')) {
-			if (strpos($url, '?') === false) {
+		if(Configure::read('Asset.version')) {
+			if(strpos($url, '?') === false) {
 				$url .= '?';
 			} else {
 				$url .= '&';
@@ -105,51 +94,49 @@ class PowerHtmlHelper extends HtmlHelper {
 		}
 
 		return $url;
-
 	}
 
-
-/**
- * css()
- * ------------------------------------
- * add possibility to
- * - handle conditional CSS inclusions
- * - define per-item options
- *
- * INLINE CSS:
- * echo $this->Html->css( 'ie-style', null, array( 'if'=>'IE', 'media'=>'screen' ));
- *
- * INCLUDE A LIST OF CSS TO THE VIEW'S "css" BLOCK:
- * $this->Html->css(array(
- *     'all',
- *     'print'   => array( 'media'=>'print' ),
- *     'mobile'  => array( 'media'=>'all and (max-width:500px)' ),
- *     'ie'      => array( 'if'=>'ie' ),
- *     'old-ie'  => 'lte IE 8'
- * ),null,array( 'inline'=>false ));
- *
- *
- */
+	/**
+	 * css()
+	 * ------------------------------------
+	 * add possibility to
+	 * - handle conditional CSS inclusions
+	 * - define per-item options
+	 *
+	 * INLINE CSS:
+	 * echo $this->Html->css( 'ie-style', null, array( 'if'=>'IE', 'media'=>'screen' ));
+	 *
+	 * INCLUDE A LIST OF CSS TO THE VIEW'S "css" BLOCK:
+	 * $this->Html->css(array(
+	 *     'all',
+	 *     'print'   => array( 'media'=>'print' ),
+	 *     'mobile'  => array( 'media'=>'all and (max-width:500px)' ),
+	 *     'ie'      => array( 'if'=>'ie' ),
+	 *     'old-ie'  => 'lte IE 8'
+	 * ),null,array( 'inline'=>false ));
+	 *
+	 *
+	 */
 	public function css($path, $rel = null, $options = array()) {
 
 		$options += array('block' => null, 'inline' => true);
 
-		if (!$options['inline'] && empty($options['block'])) {
+		if(!$options['inline'] && empty($options['block'])) {
 			$options['block'] = __FUNCTION__;
 		}
 		unset($options['inline']);
 
 
-		if (is_array($path)) {
+		if(is_array($path)) {
 			$out = '';
 
 
-			/** @@CakePOWER@@ **/
+			/** @@CakePOWER@@ * */
 			/*
-			foreach ($path as $i) {
-				$out .= "\n\t" . $this->css($i, $rel, $options);
-			}
-			*/
+			  foreach ($path as $i) {
+			  $out .= "\n\t" . $this->css($i, $rel, $options);
+			  }
+			 */
 			/**
 			 * DOC:
 			 * each css file in an array list may be defined as a simple file name ("style.css" or "style")
@@ -168,136 +155,119 @@ class PowerHtmlHelper extends HtmlHelper {
 			 * http://www.quirksmode.org/css/condcom.html
 			 *
 			 */
-			foreach ($path as $i=>$opt) {
+			foreach($path as $i => $opt) {
 
 				// Default scalar value for associative declarations.
-				if ( !is_array($opt) && !is_numeric($i) ) $opt = array( 'if'=>$opt );
+				if(!is_array($opt) && !is_numeric($i))
+					$opt = array('if' => $opt);
 
 				// Css file only declarations.
-				if ( !is_array($opt) ) {
-					$i 		= $opt;
-					$opt 	= array();
+				if(!is_array($opt)) {
+					$i = $opt;
+					$opt = array();
 				}
 
 				// Allow to per-item $rel param configuration
 				$_rel = $rel;
-				if ( isset($opt['rel']) ) {
+				if(isset($opt['rel'])) {
 					$_rel = $opt['rel'];
 					unset($opt['rel']);
 				}
 
-				$out .= "\n\t" . $this->css($i, $_rel, PowerSet::merge($options,$opt) );
+				$out .= "\n\t" . $this->css($i, $_rel, PowerSet::merge($options, $opt));
 			}
-			/** --CakePOWER-- **/
-
-
-
-
-			if (empty($options['block'])) {
+			/** --CakePOWER-- * */
+			if(empty($options['block'])) {
 				return $out . "\n";
 			}
 			return;
 		}
 
-		if (strpos($path, '//') !== false) {
+		if(strpos($path, '//') !== false) {
 			$url = $path;
 		} else {
 
-			/** @@CakePOWER@@ **/
+			/** @@CakePOWER@@ * */
 			// Compile less source to the css output file.
 			// If debug > 0
-
 			// "$this->assetPath()" exists only if AppHelpers extends CakePowerHelper!
 			// by checking it's existance we remove an ugly notice while installing the CakePOWER!
-			if ( method_exists( $this, 'assetPath') ) {
+			if(method_exists($this, 'assetPath')) {
 				$source = $this->assetPath($path, $options + array('pathPrefix' => LESS_URL, 'ext' => '.less'));
-				$target = $this->assetPath($path, $options + array('pathPrefix' => CSS_URL, 'ext' => '.css', 'exists'=>false));
-				if ( ( !file_exists($target) || Configure::read('debug') ) && file_exists($source) ) $this->auto_compile_less($source, $target);
+				$target = $this->assetPath($path, $options + array('pathPrefix' => CSS_URL, 'ext' => '.css', 'exists' => false));
+				if((!file_exists($target) || Configure::read('debug') ) && file_exists($source))
+					$this->auto_compile_less($source, $target);
 			}
-			/** --CakePOWER-- **/
-
-
+			/** --CakePOWER-- * */
 			$url = $this->assetUrl($path, $options + array('pathPrefix' => CSS_URL, 'ext' => '.css'));
 
-			if (Configure::read('Asset.filter.css')) {
+			if(Configure::read('Asset.filter.css')) {
 				$pos = strpos($url, CSS_URL);
-				if ($pos !== false) {
+				if($pos !== false) {
 					$url = substr($url, 0, $pos) . 'ccss/' . substr($url, $pos + strlen(CSS_URL));
 				}
 			}
-
-
 		}
 
-		if ($rel == 'import') {
+		if($rel == 'import') {
 
-			/** @@CakePOWER@@ **/
+			/** @@CakePOWER@@ * */
 			#$out = sprintf($this->_tags['style'], $this->_parseAttributes($options, array('inline', 'block'), '', ' '), '@import url(' . $url . ');');
-			$out = sprintf($this->_tags['style'], $this->_parseAttributes($options, array('inline', 'block', 'if', 'debug' ), '', ' '), '@import url(' . $url . ');');
-			/** --CakePOWER-- **/
-
+			$out = sprintf($this->_tags['style'], $this->_parseAttributes($options, array('inline', 'block', 'if', 'debug'), '', ' '), '@import url(' . $url . ');');
+			/** --CakePOWER-- * */
 		} else {
-			if ($rel == null) {
+			if($rel == null) {
 				$rel = 'stylesheet';
 			}
 
-			/** @@CakePOWER@@ **/
+			/** @@CakePOWER@@ * */
 			#$out = sprintf($this->_tags['css'], $rel, $url, $this->_parseAttributes($options, array('inline', 'block'), '', ' '));
-			$out = sprintf($this->_tags['css'], $rel, $url, $this->_parseAttributes($options, array('inline', 'block', 'if', 'debug' ), '', ' '));
-			/** --CakePOWER-- **/
-
+			$out = sprintf($this->_tags['css'], $rel, $url, $this->_parseAttributes($options, array('inline', 'block', 'if', 'debug'), '', ' '));
+			/** --CakePOWER-- * */
 		}
 
 
-		/** @@CakePOWER@@ **/
+		/** @@CakePOWER@@ * */
 		/* apply conditional comment */
-		if ( !empty($options['if']) ) {
+		if(!empty($options['if'])) {
 			$out = '<!--[if ' . $options['if'] . ']>' . $out . '<![endif]-->';
 		}
 
-		if ( !empty($options['debug']) ) {
+		if(!empty($options['debug'])) {
 			$out = "\r\n" . $out;
 		}
-		/** --CakePOWER-- **/
-
-
-		if (empty($options['block'])) {
+		/** --CakePOWER-- * */
+		if(empty($options['block'])) {
 			return $out;
 		} else {
 			$this->_View->append($options['block'], $out);
 		}
-
 	}
 
-
-
-
-
-
-/**
- * OVERRIDE
- * adds the ability to import a require.js script with a CakePHP notated "data-main" option.
- */
+	/**
+	 * OVERRIDE
+	 * adds the ability to import a require.js script with a CakePHP notated "data-main" option.
+	 */
 	public function script($url, $options = array()) {
-		if (is_bool($options)) {
+		if(is_bool($options)) {
 			list($inline, $options) = array($options, array());
 			$options['inline'] = $inline;
 		}
 		$options = array_merge(array('block' => null, 'inline' => true, 'once' => true), $options);
-		if (!$options['inline'] && empty($options['block'])) {
+		if(!$options['inline'] && empty($options['block'])) {
 			$options['block'] = __FUNCTION__;
 		}
 		unset($options['inline']);
 
-		if (is_array($url)) {
+		if(is_array($url)) {
 			$out = '';
 
-			/** @@CakePOWER@@ **/
+			/** @@CakePOWER@@ * */
 			/*
-			foreach ($url as $i) {
-				$out .= "\n\t" . $this->script($i, $options);
-			}
-			*/
+			  foreach ($url as $i) {
+			  $out .= "\n\t" . $this->script($i, $options);
+			  }
+			 */
 			/**
 			 * DOC:
 			 * each js file in an array list may be defined as a simple file name ("script.js" or "script")
@@ -315,89 +285,88 @@ class PowerHtmlHelper extends HtmlHelper {
 			 * http://www.quirksmode.org/css/condcom.html
 			 *
 			 */
-			foreach ($url as $i=>$opt) {
+			foreach($url as $i => $opt) {
 
 				// Default scalar value for associative declarations.
-				if ( !is_array($opt) && !is_numeric($i) ) $opt = array( 'if'=>$opt );
+				if(!is_array($opt) && !is_numeric($i))
+					$opt = array('if' => $opt);
 
 				// Css file only declarations.
-				if ( !is_array($opt) ) {
-					$i 		= $opt;
-					$opt 	= array();
+				if(!is_array($opt)) {
+					$i = $opt;
+					$opt = array();
 				}
 
-				$out .= "\n\t" . $this->script($i, PowerSet::merge($options,$opt) );
+				$out .= "\n\t" . $this->script($i, PowerSet::merge($options, $opt));
 			}
-			/** --CakePOWER-- **/
-
-			if (empty($options['block'])) {
+			/** --CakePOWER-- * */
+			if(empty($options['block'])) {
 				return $out . "\n";
 			}
 			return null;
 		}
-		if ($options['once'] && isset($this->_includedScripts[$url])) {
+		if($options['once'] && isset($this->_includedScripts[$url])) {
 			return null;
 		}
 		$this->_includedScripts[$url] = true;
 
 		$originalUrl = $url;
 
-		if (strpos($url, '//') === false) {
+		if(strpos($url, '//') === false) {
 
 			list($plugin, $urlNoPlugin) = pluginSplit($url);
 
-			$url =  $this->assetUrl($originalUrl, $options + array('pathPrefix' => JS_URL, 'ext' => '.js'));
+			$url = $this->assetUrl($originalUrl, $options + array('pathPrefix' => JS_URL, 'ext' => '.js'));
 
-			if (Configure::read('Asset.filter.js')) {
-				$url =  $this->assetUrl($originalUrl, $options + array('pathPrefix' => 'cjs/', 'ext' => '.js'));
+			if(Configure::read('Asset.filter.js')) {
+				$url = $this->assetUrl($originalUrl, $options + array('pathPrefix' => 'cjs/', 'ext' => '.js'));
 			}
 
+			/**
+			 * RequireJS Optimization
+			 * ======================
+			 *
+			 * mechanism to change javascript source files from js/ to js-compiled/ folder.
+			 * this is extremely useful when implement a RequireJS application!
+			 *
+			 *
+			 *
+			  /** @@CakePOWER@@ * */
+			// allow to change js default folder from "js" to "js-compiled"
+			$jsUrl = substr(JS_URL, 0, strlen(JS_URL) - 1);
+
+			// setup debug mode into session to test across multiple requests
+			if(isset($_GET['jsdbgOn']))
+				SessionComponent::write('jsdbg', true);
+			if(isset($_GET['jsdbgOff']))
+				SessionComponent::delete('jsdbg');
+
+			if(isset($plugin) && !is_null($plugin)) {
+				$compiledPath = App::pluginPath($plugin) . WEBROOT_DIR . DS . str_replace('/', '', JS_URL) . '-compiled' . DS . $urlNoPlugin . '.js';
+			} else {
+				$compiledPath = WWW_ROOT . DS . str_replace('/', '', JS_URL) . '-compiled' . DS . $urlNoPlugin . '.js';
+			}
+
+			// decide what js folder to use based on combination on debug status
+			if(
+					(( Configure::read('debug') == 0 && !isset($_GET['jsdbg']) && !CakeSession::check('jsdbg') )  // production mode + debug
+					|| ( Configure::read('debug') > 0 && ( isset($_GET['jsdbg']) || CakeSession::check('jsdbg') ) )) // developement mode + production test
+					&& file_exists($compiledPath)
+			)
+				$jsUrl .= '-compiled';
+
+			// Replace in-page scripts urls
+			$url = str_replace(JS_URL, $jsUrl . '/', $url);
+
+			// RequireJS DATA-MAIN attribute parsing
+			if(strpos($url, 'require') !== false && isset($options['data-main']) && strpos($options['data-main'], '//') === false) {
+				$tmp = Configure::read('Asset.version');
+				Configure::write('Asset.version', false);
+				$options['data-main'] = $this->assetUrl($options['data-main'], array('pathPrefix' => $jsUrl . '/', 'ext' => '.js'));
+				Configure::write('Asset.version', $tmp);
+			}
+			/** --CakePOWER-- * */
 		}
-
-
-
-		/**
-		 * RequireJS Optimization
-		 * ======================
-		 *
-		 * mechanism to change javascript source files from js/ to js-compiled/ folder.
-		 * this is extremely useful when implement a RequireJS application!
-		 *
-		 *
-		 *
-		/** @@CakePOWER@@ **/
-
-		// allow to change js default folder from "js" to "js-compiled"
-		$jsUrl = substr(JS_URL, 0, strlen(JS_URL)-1);
-
-		// setup debug mode into session to test across multiple requests
-		if ( isset($_GET['jsdbgOn']) ) 	SessionComponent::write('jsdbg',true);
-		if ( isset($_GET['jsdbgOff']) ) SessionComponent::delete('jsdbg');
-
-		if(!is_null($plugin)) {
-			$compiledPath = App::pluginPath($plugin) . WEBROOT_DIR . DS . str_replace('/', '', JS_URL) . '-compiled' . DS . $urlNoPlugin . '.js';
-		} else {
-			$compiledPath = WWW_ROOT . DS . str_replace('/', '', JS_URL) . '-compiled' . DS . $urlNoPlugin . '.js';
-		}
-
-		// decide what js folder to use based on combination on debug status
-		if (
-			(( Configure::read('debug') == 0 && !isset($_GET['jsdbg']) && !CakeSession::check('jsdbg') ) 	// production mode + debug
-			||	( Configure::read('debug') > 0 && ( isset($_GET['jsdbg']) || CakeSession::check('jsdbg') ) ))	// developement mode + production test
-			&& file_exists($compiledPath)
-		) $jsUrl .= '-compiled';
-
-		// Replace in-page scripts urls
-		$url = str_replace( JS_URL, $jsUrl.'/', $url );
-
-		// RequireJS DATA-MAIN attribute parsing
-		if ( strpos($url,'require') !== false && isset($options['data-main']) && strpos($options['data-main'],'//') === false ) {
-			$tmp = Configure::read('Asset.version');
-			Configure::write('Asset.version', false);
-			$options['data-main'] = $this->assetUrl($options['data-main'], array('pathPrefix' => $jsUrl.'/', 'ext' => '.js'));
-			Configure::write('Asset.version', $tmp);
-		}
-		/** --CakePOWER-- **/
 
 
 
@@ -408,38 +377,34 @@ class PowerHtmlHelper extends HtmlHelper {
 		$out = sprintf($this->_tags['javascriptlink'], $url, $attributes);
 
 
-		/** @@CakePOWER@@ **/
+		/** @@CakePOWER@@ * */
 		/* apply conditional comment */
-		if ( !empty($options['if']) ) {
+		if(!empty($options['if'])) {
 			$out = '<!--[if ' . $options['if'] . ']>' . $out . '<![endif]-->';
 		}
 
-		if ( !empty($options['debug']) ) {
+		if(!empty($options['debug'])) {
 			$out = "\r\n" . $out;
 		}
-		/** --CakePOWER-- **/
-
-		if (empty($options['block'])) {
+		/** --CakePOWER-- * */
+		if(empty($options['block'])) {
 			return $out;
 		} else {
 			$this->_View->append($options['block'], $out);
 		}
 	}
 
+	public function tag($name = null, $text = null, $options = array()) {
 
-
-
-	public function tag($name=null, $text=null, $options=array()) {
-
-		if (is_array($name)) {
+		if(is_array($name)) {
 			return $this->atag($name);
 		}
 
-		if (empty($name)) {
+		if(empty($name)) {
 			$name = 'div';
 		}
 
-		if (empty($text)) {
+		if(empty($text)) {
 			$text = '';
 		}
 
@@ -450,19 +415,19 @@ class PowerHtmlHelper extends HtmlHelper {
 			'autoRender' => true,
 			'if' => true,
 			'else' => null,
-		));
+				));
 
 		// extract Xtype and clear options
 		$xtype = $options['xtype'];
 		$options = PowerSet::clear($options, 'xtype');
 
 		// apply Xtype configuration callback
-		if ( ($xtypeOptions = $this->_xtypeOptions($xtype, $name, $text, $options)) !== null) {
+		if(($xtypeOptions = $this->_xtypeOptions($xtype, $name, $text, $options)) !== null) {
 			list($name, $text, $options) = $xtypeOptions;
 		}
 
 		// handle conditional tag option:
-		switch( gettype($options['if']) ) {
+		switch(gettype($options['if'])) {
 			case 'string':
 			case 'object':
 			case 'array':
@@ -473,8 +438,8 @@ class PowerHtmlHelper extends HtmlHelper {
 		// apply conditional tag option:
 		// QUESTION: "else" should be another tag configuration array to output in-place
 		// of the actual or simply an alternative content to replace?
-		if ($options['if'] === false) {
-			if ($options['else'] !== null) {
+		if($options['if'] === false) {
+			if($options['else'] !== null) {
 				return $this->tag($options['else']);
 			} else {
 				return;
@@ -482,41 +447,40 @@ class PowerHtmlHelper extends HtmlHelper {
 		}
 
 		// apply sub-tags
-		if (is_array($text) && $options['autoRender'] === true) {
+		if(is_array($text) && $options['autoRender'] === true) {
 			$text = $this->atag($text);
 		}
 
 		// check for empty value to be cleared:
-		if ( empty($text) && $options['allowEmpty'] !== true ) {
-			if (!in_array($name, explode(',', $options['allowEmpty']))) return;
+		if(empty($text) && $options['allowEmpty'] !== true) {
+			if(!in_array($name, explode(',', $options['allowEmpty'])))
+				return;
 		}
 
 		// clear options array
 		$options = PowerSet::clear($options, array(
-			'allowEmpty',
-			'autoRender',
-			'if',
-			'else'
-		));
+					'allowEmpty',
+					'autoRender',
+					'if',
+					'else'
+				));
 
 		// apply xtype content callback
 		$xtype = $this->_xtypeTag($xtype, $name, $text, $options);
-		if (is_string($xtype)) {
+		if(is_string($xtype)) {
 			return $xtype;
 		}
 
 		// filters non standard attributes
 		//$options = $this->filterValidTagOptions($options);
-
 		// Use the CakePHP's parent method to output the HTML source.
 		return parent::tag($name, $text, $options);
-
 	}
 
 	protected function _xtypeOptions($xtype, $name, $text, $options) {
-		foreach ($this->_xtypeGetContext() as $helper=>$xtypes) {
-			if (isset($xtypes[$xtype])) {
-				if (($tmp = $this->_View->$helper->$xtypes[$xtype]('options', $name, $text, $options)) !== null) {
+		foreach($this->_xtypeGetContext() as $helper => $xtypes) {
+			if(isset($xtypes[$xtype])) {
+				if(($tmp = $this->_View->$helper->$xtypes[$xtype]('options', $name, $text, $options)) !== null) {
 					return $tmp;
 				}
 			}
@@ -524,9 +488,9 @@ class PowerHtmlHelper extends HtmlHelper {
 	}
 
 	protected function _xtypeTag($xtype, $name, $text, $options) {
-		foreach ($this->_xtypeGetContext() as $helper=>$xtypes) {
-			if (isset($xtypes[$xtype])) {
-				if (($tmp = $this->_View->$helper->$xtypes[$xtype]('tag', $name, $text, $options)) !== null) {
+		foreach($this->_xtypeGetContext() as $helper => $xtypes) {
+			if(isset($xtypes[$xtype])) {
+				if(($tmp = $this->_View->$helper->$xtypes[$xtype]('tag', $name, $text, $options)) !== null) {
 					return $tmp;
 				}
 			}
@@ -536,59 +500,55 @@ class PowerHtmlHelper extends HtmlHelper {
 	protected function _xtypeGetContext() {
 
 		// return a cached version of xtype view context
-		if (!empty($this->_xtypeContext)) {
+		if(!empty($this->_xtypeContext)) {
 			return $this->_xtypeContext;
 		}
 
 		// build view context
 		$this->_xtypeContext = array();
-		foreach ($this->_View as $prop=>$val) {
-			if (is_object($this->_View->$prop) && is_subclass_of($this->_View->$prop,'Helper')) {
+		foreach($this->_View as $prop => $val) {
+			if(is_object($this->_View->$prop) && is_subclass_of($this->_View->$prop, 'Helper')) {
 				$this->_xtypeContext[$prop] = array();
-				foreach (get_class_methods($this->_View->$prop) as $method) {
-					if (substr($method, 0, 5) == 'xtype') {
+				foreach(get_class_methods($this->_View->$prop) as $method) {
+					if(substr($method, 0, 5) == 'xtype') {
 						$xtype = Inflector::underscore(substr($method, 5, strlen($method)));
 						$this->_xtypeContext[$prop][$xtype] = substr($method, 0, strlen($method));
 					}
 				}
 			}
-			if (empty($this->_xtypeContext[$prop])) {
+			if(empty($this->_xtypeContext[$prop])) {
 				unset($this->_xtypeContext[$prop]);
 			}
 		}
 
 		#ddebug($this->_xtypeContext);
 		return $this->_xtypeContext;
-
 	}
-
-
 
 	protected function solveTagConditional($name, $text, $options) {
 
 		// direct callable object
-		if (is_callable($options['if'])) {
+		if(is_callable($options['if'])) {
 			return call_user_func($options['if'], $name, $text, $options);
 		}
 
 		// @TODO: needs to solve more complex callabel configurations like
 		// array( method, object )
 		// object::method
-
 	}
 
-	protected function atag( $options = array() ) {
+	protected function atag($options = array()) {
 
 		// retro-compatibility notation
 		// may trigger a warning to alert that these keywords may not exists anymore!
-		if (isset($options['name']) || isset($options['text'])) {
+		if(isset($options['name']) || isset($options['text'])) {
 
-			if (isset($options['name'])) {
+			if(isset($options['name'])) {
 				#trigger_error('PowerHtmlHelper::atag() "name" key is now deprecated!', E_USER_WARNING );
 				$options['tag'] = $options['name'];
 				unset($options['name']);
 			}
-			if (isset($options['text'])) {
+			if(isset($options['text'])) {
 				#trigger_error('PowerHtmlHelper::atag() "content" key is now deprecated!', E_USER_WARNING );
 				$options['content'] = $options['text'];
 				unset($options['text']);
@@ -596,21 +556,21 @@ class PowerHtmlHelper extends HtmlHelper {
 		}
 
 		// direct configuration array
-		if ( array_key_exists('xtype', $options) || array_key_exists('tag', $options) || array_key_exists('content', $options) || array_key_exists('id', $options) || array_key_exists('class', $options) || array_key_exists('style', $options) ) {
+		if(array_key_exists('xtype', $options) || array_key_exists('tag', $options) || array_key_exists('content', $options) || array_key_exists('id', $options) || array_key_exists('class', $options) || array_key_exists('style', $options)) {
 
 			$options = $this->atagDefaults($options);
 
 			// apply standard params tag method
-			return $this->tag($options['tag'], $options['content'], PowerSet::clear($options, array('tag','content')));
+			return $this->tag($options['tag'], $options['content'], PowerSet::clear($options, array('tag', 'content')));
 
-		// list of sub-tags, generates a string as output.
-		// tag configuration items will be translated to tags, strings or other format will be appended as thei are.
+			// list of sub-tags, generates a string as output.
+			// tag configuration items will be translated to tags, strings or other format will be appended as thei are.
 		} else {
 
 			$string = '';
 
-			foreach ( $options as $tag ) {
-				if ( is_array($tag) ) {
+			foreach($options as $tag) {
+				if(is_array($tag)) {
 					$string.= $this->tag($tag);
 				} else {
 					$string.= $tag;
@@ -618,11 +578,8 @@ class PowerHtmlHelper extends HtmlHelper {
 			}
 
 			return $string;
-
 		}
-
 	}
-
 
 	/**
 	 * Fetch an implicit content from given array and translates into a full key=>val array
@@ -642,34 +599,28 @@ class PowerHtmlHelper extends HtmlHelper {
 	 *
 	 * @param array $options
 	 */
-	public function atagDefaults($arr, $options=null) {
+	public function atagDefaults($arr, $options = null) {
 
-		$options = PowerSet::def($options,array(
-			'tagKey' => 'tag',
-			'textKey' => 'content'
-		));
+		$options = PowerSet::def($options, array(
+					'tagKey' => 'tag',
+					'textKey' => 'content'
+				));
 
 		// search for a last non-associative value for the config array to be used as text or sub-tags
-		if ( !array_key_exists($options['textKey'], $arr) ) {
-			if ( @gettype(array_pop(array_keys($arr))) === 'integer' ) {
+		if(!array_key_exists($options['textKey'], $arr)) {
+			if(@gettype(array_pop(array_keys($arr))) === 'integer') {
 				$arr[$options['textKey']] = array_pop($arr);
 			}
 		}
 
 		// apply tag's defaults
 		$arr = PowerSet::extend(array(
-			$options['tagKey'] => null,
-			$options['textKey'] => null,
-		),$arr);
+					$options['tagKey'] => null,
+					$options['textKey'] => null,
+						), $arr);
 
 		return $arr;
 	}
-
-
-
-
-
-
 
 	/**
 	 * Global accessible method to set default values for a tag() options array.
@@ -681,32 +632,28 @@ class PowerHtmlHelper extends HtmlHelper {
 	 * 'color:red' -> array( 'id'=>'', 'class'=>'', 'style'=>'color:red' )
 	 *
 	 */
-	public static function tagOptions( $arr = '', $defaultValues = null, $options = array() ) {
+	public static function tagOptions($arr = '', $defaultValues = null, $options = array()) {
 
 		// apply some defaults attributes to be used in every unspecified case
-		if ( $defaultValues === null ) {
-			$defaultValues = array( 'id'=>'', 'class'=>'', 'style'=>'' );
+		if($defaultValues === null) {
+			$defaultValues = array('id' => '', 'class' => '', 'style' => '');
 		}
 
-		$options = PowerSet::def( $options,array(
-			'txtAttr' => 'class'
-		),'txtAttr');
+		$options = PowerSet::def($options, array(
+					'txtAttr' => 'class'
+						), 'txtAttr');
 
 		// parse string configuration into inline CSS style or other given attribute (class)
-		if ( is_string($arr) ) {
+		if(is_string($arr)) {
 
-			if ( strpos($arr,':') === false ) {
-				$arr = array( $options['txtAttr']=>$arr );
-
+			if(strpos($arr, ':') === false) {
+				$arr = array($options['txtAttr'] => $arr);
 			} else {
-				$arr = array( 'style'=>$arr );
-
+				$arr = array('style' => $arr);
 			}
-
 		}
 
 		return PowerSet::def($arr, $defaultValues, $options['txtAttr']);
-
 	}
 
 	/**
@@ -716,70 +663,62 @@ class PowerHtmlHelper extends HtmlHelper {
 	public static function isValidTagOption($key) {
 
 		// filter allowed attributes
-		if ( in_array($key,self::$allowedAttributes) ) return true;
+		if(in_array($key, self::$allowedAttributes))
+			return true;
 
 		// allow all data- attributes
-		if ( substr($key,0,5) === 'data-' ) return true;
+		if(substr($key, 0, 5) === 'data-')
+			return true;
 
 		return false;
 	}
 
 	public static function filterValidTagOptions($options) {
-		foreach ($options as $key=>$val) {
-			if (!self::isValidTagOption($key)) {
+		foreach($options as $key => $val) {
+			if(!self::isValidTagOption($key)) {
 				unset($options[$key]);
 			}
 		}
 		return $options;
 	}
 
-
-
-
 	/**
 	 * Renders a list of tags
 	 *
 	 * @param array $tags
 	 */
-	public function tags( $tags = array() ) {
+	public function tags($tags = array()) {
 
-		trigger_error('tags() is now deprecated and will be removed soon!', E_USER_WARNING );
+		trigger_error('tags() is now deprecated and will be removed soon!', E_USER_WARNING);
 
 		$html = '';
 
-		foreach ( $tags as $tag ) {
+		foreach($tags as $tag) {
 
-			if ( is_array($tag) ) {
+			if(is_array($tag)) {
 
-				$html.= $this->tag(PowerSet::def($tag,null,'content'));
-
+				$html.= $this->tag(PowerSet::def($tag, null, 'content'));
 			} else {
 
 				$html.= $tag;
-
 			}
-
 		}
 
 		return $html;
-
 	}
 
-
-
-
-/**
- * Complete override of the CakePHP's HtmlHelper::div()
- * It behaves like the original method but using CakePower's tag()
- * all empty tag attributes are cleaned!
- */
+	/**
+	 * Complete override of the CakePHP's HtmlHelper::div()
+	 * It behaves like the original method but using CakePower's tag()
+	 * all empty tag attributes are cleaned!
+	 */
 	public function div($class = null, $text = null, $options = array()) {
 
 		// Support for full-array configuration.
-		if ( is_array($class) ) {
+		if(is_array($class)) {
 
 			$options = $class;
-			$options+= array( 'class'=>'', 'content'=>'' );
+			$options+= array('class' => '', 'content' => '');
 
 			$class = $options['class'];
 			unset($options['class']);
@@ -787,73 +726,65 @@ class PowerHtmlHelper extends HtmlHelper {
 			$text = $options['content'];
 			unset($options['content']);
 
-			return $this->div( $class, $text, $options );
-
+			return $this->div($class, $text, $options);
 		}
 
 		$options['class'] = $class;
 
-		return $this->tag( 'div', $text, $options );
-
+		return $this->tag('div', $text, $options);
 	}
 
+	/**
+	 * Acts like "div()" but allow to pass div's ID as first parameter
+	 */
+	public function idiv($id, $text = null, $options = array()) {
 
-/**
- * Acts like "div()" but allow to pass div's ID as first parameter
- */
-	public function idiv( $id, $text = null, $options = array() ) {
-
-		$options += array( 'class'=>'' );
+		$options += array('class' => '');
 
 		$options['id'] = $id;
 
-		return $this->div( $options['class'], $text, $options );
-
+		return $this->div($options['class'], $text, $options);
 	}
 
-
-	public function p( $text = '', $options = array() ) {
+	public function p($text = '', $options = array()) {
 
 		// Full array configuration
-		if ( is_array($text) ) {
+		if(is_array($text)) {
 
-			$options = $text += array( 'content'=>'' );
+			$options = $text += array('content' => '');
 
 			$text = $options['content'];
 			unset($options['content']);
-
 		}
 
-		$options += array( 'class'=>'' );
+		$options += array('class' => '');
 
 		$class = $options['class'];
 		unset($options['class']);
 
-		return $this->para( $class, $text, $options );
-
+		return $this->para($class, $text, $options);
 	}
 
+	/**
+	 * Definition List Utility
+	 * =======================
+	 *
+	 * @param unknown_type $data
+	 * @param unknown_type $options
+	 */
+	public function dl($data = '', $options = array()) {
 
-/**
- * Definition List Utility
- * =======================
- *
- * @param unknown_type $data
- * @param unknown_type $options
- */
-	public function dl( $data = '', $options = array() ) {
-
-		$options += array( 'dtOptions'=>array(), 'ddOptions'=>array(), 'skipEmptyValues'=>true );
+		$options += array('dtOptions' => array(), 'ddOptions' => array(), 'skipEmptyValues' => true);
 
 		// Build List Body
 		ob_start();
-		foreach ( $data as $lbl=>$val ) {
+		foreach($data as $lbl => $val) {
 
-			if ( $options['skipEmptyValues'] && empty($val) ) continue;
+			if($options['skipEmptyValues'] && empty($val))
+				continue;
 
-			echo $this->tag( 'dt', $lbl, $options['dtOptions'] );
-			echo $this->tag( 'dd', $val, $options['ddOptions'] );
-
+			echo $this->tag('dt', $lbl, $options['dtOptions']);
+			echo $this->tag('dd', $val, $options['ddOptions']);
 		}
 
 		unset($options['dtOptions']);
@@ -861,110 +792,107 @@ class PowerHtmlHelper extends HtmlHelper {
 		unset($options['skipEmptyValues	']);
 
 		// Build List Wrapper with Options
-		return $this->tag( 'dl', ob_get_clean(), $options );
-
+		return $this->tag('dl', ob_get_clean(), $options);
 	}
 
-	public function listTag( $type = 'ul', $data = array(), $options = array() ) {
+	public function listTag($type = 'ul', $data = array(), $options = array()) {
 
-		if ( !is_array($options) ) $options = array( 'class'=>$options );
-		$options += array( 'liOptions'=>array(), 'skipEmptyValues'=>true );
+		if(!is_array($options))
+			$options = array('class' => $options);
+		$options += array('liOptions' => array(), 'skipEmptyValues' => true);
 
 
 		// Build List Body
 		ob_start();
-		foreach ( $data as $content=>$liOptions ) {
+		foreach($data as $content => $liOptions) {
 
-			if ( is_numeric($content) ) {
+			if(is_numeric($content)) {
 				$content = $liOptions;
 				$liOptions = array();
 			}
 
-			$liOptions = PowerSet::merge( $options['liOptions'], $liOptions );
+			$liOptions = PowerSet::merge($options['liOptions'], $liOptions);
 
-			if ( $options['skipEmptyValues'] && empty($content) ) continue;
+			if($options['skipEmptyValues'] && empty($content))
+				continue;
 
-			echo $this->tag( 'li', $content, $liOptions );
-
+			echo $this->tag('li', $content, $liOptions);
 		}
 
 		unset($options['liOptions']);
 		unset($options['skipEmptyValues']);
 
 		// Build List Wrapper with Options
-		return $this->tag( $type, ob_get_clean(), $options );
-
+		return $this->tag($type, ob_get_clean(), $options);
 	}
 
-	public function ul( $data = '', $options = array() ) {
+	public function ul($data = '', $options = array()) {
 
-		return $this->listTag( 'ul', $data, $options );
-
+		return $this->listTag('ul', $data, $options);
 	}
 
-	public function ol( $data = '', $options = array() ) {
+	public function ol($data = '', $options = array()) {
 
-		return $this->listTag( 'ol', $data, $options );
-
+		return $this->listTag('ol', $data, $options);
 	}
 
-
-/**
- * Utility to create a DOM named item form a view's block of data.
- *
- * It uses VIEW::fetch() to grab contents from desired view block then creates
- * a DOM item (div as default) with block's name as ID property.
- *
- * You can customize default tagName and all DOM options used in the "tag()" method.
- *
- * $this->Html->block( 'sidebar' ) --> <div id="sidebar">... sidebar content ...</div>
- * $this->Html->block( 'sidebar', 'col-dx' ) --> <div id="sidebar" class="col-dx">... sidebar content ...</div>
- * $this->Html->block( 'sidebar', array( 'class'=>'col-dx', 'style'=>'text-align:right' ) ) --> <div id="sidebar" class="col-dx" style="text-align:right">... sidebar content ...</div>
- *
- * // full array configuration
- * $this->Html->block(array(
- * 	'name' 		=> 'sidebar',
- * 	'class' 	=> 'col-dx',
- * 	'style' 	=> 'text-align:right',
- * 	'tagName' 	=> 'p'
- * ));
- *
- * --> <p id="sidebar" class="col-dx" style="text-align:right">... sidebar content ...</p>
- *
- * Blog's Entry:
- * http://movableapp.com/2012/07/cakephp-using-view-blocks-the-cakepower-way/
- *
- */
-	public function block( $id, $options = array() ) {
+	/**
+	 * Utility to create a DOM named item form a view's block of data.
+	 *
+	 * It uses VIEW::fetch() to grab contents from desired view block then creates
+	 * a DOM item (div as default) with block's name as ID property.
+	 *
+	 * You can customize default tagName and all DOM options used in the "tag()" method.
+	 *
+	 * $this->Html->block( 'sidebar' ) --> <div id="sidebar">... sidebar content ...</div>
+	 * $this->Html->block( 'sidebar', 'col-dx' ) --> <div id="sidebar" class="col-dx">... sidebar content ...</div>
+	 * $this->Html->block( 'sidebar', array( 'class'=>'col-dx', 'style'=>'text-align:right' ) ) --> <div id="sidebar" class="col-dx" style="text-align:right">... sidebar content ...</div>
+	 *
+	 * // full array configuration
+	 * $this->Html->block(array(
+	 * 	'name' 		=> 'sidebar',
+	 * 	'class' 	=> 'col-dx',
+	 * 	'style' 	=> 'text-align:right',
+	 * 	'tagName' 	=> 'p'
+	 * ));
+	 *
+	 * --> <p id="sidebar" class="col-dx" style="text-align:right">... sidebar content ...</p>
+	 *
+	 * Blog's Entry:
+	 * http://movableapp.com/2012/07/cakephp-using-view-blocks-the-cakepower-way/
+	 *
+	 */
+	public function block($id, $options = array()) {
 
 		// allow a full-array configuration
-		if ( is_array($id) ) {
+		if(is_array($id)) {
 
-			$id += array( 'name'=>'' );
+			$id += array('name' => '');
 
 			$options = $id;
 
 			$id = $options['name'];
 
 			unset($options['name']);
-
 		}
 
 		// class as string parameter
-		if ( is_string($options) ) $options = array( 'class'=>$options );
+		if(is_string($options))
+			$options = array('class' => $options);
 
 		// options default values
 		$options += array(
-			'id'			=> $id,
-			'tagName'		=> 'div',
-			'hideOnEmpty' 	=> false
+			'id' => $id,
+			'tagName' => 'div',
+			'hideOnEmpty' => false
 		);
 
 		// fetch the text
-		$content = $this->_View->fetch( $id );
+		$content = $this->_View->fetch($id);
 
 		// option "hideOnEmpty" check
-		if ( empty($content) && $options['hideOnEmpty'] !== false ) return;
+		if(empty($content) && $options['hideOnEmpty'] !== false)
+			return;
 		unset($options['hideOnEmpty']);
 
 		// extract the tagName from the config options
@@ -973,142 +901,127 @@ class PowerHtmlHelper extends HtmlHelper {
 
 		// return the block
 		return $this->tag($tagName, $content, $options);
-
 	}
 
-
-
-/**
- * Override
- * Automagically disable escape as default options if images are linked.
- */
+	/**
+	 * Override
+	 * Automagically disable escape as default options if images are linked.
+	 */
 	public function link($title, $url = null, $options = array(), $confirmMessage = false) {
 
-		if ( strpos($title,'<img src') 		!== false ) $options += array( 'escape'=>false );
-		if ( strpos($title,'<span') 		!== false ) $options += array( 'escape'=>false );
-		if ( strpos($title,'<strong') 		!== false ) $options += array( 'escape'=>false );
-		if ( strpos($title,'<em') 			!== false ) $options += array( 'escape'=>false );
-		if ( strpos($title,'<i') 			!== false ) $options += array( 'escape'=>false );
-		if ( strpos($title,'<b') 			!== false ) $options += array( 'escape'=>false );
+		if(strpos($title, '<img src') !== false)
+			$options += array('escape' => false);
+		if(strpos($title, '<span') !== false)
+			$options += array('escape' => false);
+		if(strpos($title, '<strong') !== false)
+			$options += array('escape' => false);
+		if(strpos($title, '<em') !== false)
+			$options += array('escape' => false);
+		if(strpos($title, '<i') !== false)
+			$options += array('escape' => false);
+		if(strpos($title, '<b') !== false)
+			$options += array('escape' => false);
 
-		return parent::link( $title, $url, $options, $confirmMessage );
-
+		return parent::link($title, $url, $options, $confirmMessage);
 	}
 
+	/**
+	 * Utility method to render a TableUI object with standard or custom (extended) object
+	 *
+	 *     // view code - custom tableUI object
+	 *     class myTable extends PanelTableUI { ... }
+	 *     echo $this->Panel->table( $list, 'myTable' );
+	 *
+	 *     // view core - generic tableUI with configurations
+	 *     echo $this->Panel->table( $list, array(
+	 * 	     'modelName' => 'Foo'
+	 *     ));
+	 *
+	 * This method should auto load tableUI class if not present.
+	 * By default $tableUI is searched inside "Vendor" package but you should customize loading
+	 * search path as follow:
+	 *
+	 *     echo $this->Panel->table( $list, 'Plugin.Vendor/customTableObject' );
+	 *     echo $this->Panel->table( $list, 'Plugin.Vendor/subpackage/customTableObject' );
+	 *
+	 * this kind of $tableUI name will causes:
+	 *
+	 *     App::uses( 'customTableObject', 'Plugin.Vendor' );
+	 *     App::uses( 'customTableObject', 'Plugin.Vendor/subpackage' );
+	 *
+	 * this approach allow to store
+	 *
+	 */
+	public function table($data, $settings = array()) {
 
-
-
-/**
- * Utility method to render a TableUI object with standard or custom (extended) object
- *
- *     // view code - custom tableUI object
- *     class myTable extends PanelTableUI { ... }
- *     echo $this->Panel->table( $list, 'myTable' );
- *
- *     // view core - generic tableUI with configurations
- *     echo $this->Panel->table( $list, array(
- * 	     'modelName' => 'Foo'
- *     ));
- *
- * This method should auto load tableUI class if not present.
- * By default $tableUI is searched inside "Vendor" package but you should customize loading
- * search path as follow:
- *
- *     echo $this->Panel->table( $list, 'Plugin.Vendor/customTableObject' );
- *     echo $this->Panel->table( $list, 'Plugin.Vendor/subpackage/customTableObject' );
- *
- * this kind of $tableUI name will causes:
- *
- *     App::uses( 'customTableObject', 'Plugin.Vendor' );
- *     App::uses( 'customTableObject', 'Plugin.Vendor/subpackage' );
- *
- * this approach allow to store
- *
- */
-	public function table( $data, $settings = array() ) {
-
-		if ( isset($data['data']) ) {
+		if(isset($data['data'])) {
 			$settings = $data;
 			$data = $settings['data'];
 			unset($settings['data']);
 		}
 
 		// string settings means custom object
-		if ( is_string($settings) ) $settings = array( 'className'=>$settings );
+		if(is_string($settings))
+			$settings = array('className' => $settings);
 
 		// apply defaults to settings
-		if ( !is_array($settings) || empty($settings) ) $options = array();
-		$settings+= array( 'className'=>'' );
+		if(!is_array($settings) || empty($settings))
+			$options = array();
+		$settings+= array('className' => '');
 
 		// define and import custom object
 		$className = !empty($settings['className']) ? $settings['className'] : 'CakePower.Vendor/PowerTableUi';
-		list( $className, $package,  ) = packageCmp($className);
-		App::uses( $className, $package );
+		list( $className, $package, ) = packageCmp($className);
+		App::uses($className, $package);
 		unset($settings['className']);
 
 		// creates table object instance
-		$obj = new $className( $this->_View, $settings );
+		$obj = new $className($this->_View, $settings);
 		return $obj->render($data);
-
 	}
 
+	/**
+	 * Interface to an authorization layer.
+	 * Test an if an url can be accessed.
+	 *
+	 * Return values:
+	 * true: 	the url can be accessed
+	 * false: 	the url is denied
+	 * null: 	it is no possibile to check the url (external urls...)
+	 */
+	public function allowUrl($url = '') {
+		return true;
+	}
 
+	/**
+	 * Actions Link
+	 * these methods expose some actions that user may use in the view AS CONCEPTS.
+	 *
+	 * Each method generates a simple link that implement a class.
+	 * It is a UI assets stuff to apply css rules and behaviors to that class!
+	 *
+	 * Some UI kit like Twitter Bootstrap supplies some action driven components (aka buttons)
+	 */
+	public function action($url = array(), $options = array()) {
 
+		if(is_string($options))
+			$options = array('text' => $options);
 
+		$options += array('text' => '', 'class' => 'ui-action');
 
-
-
-/**
- * Interface to an authorization layer.
- * Test an if an url can be accessed.
- *
- * Return values:
- * true: 	the url can be accessed
- * false: 	the url is denied
- * null: 	it is no possibile to check the url (external urls...)
- */
-	public function allowUrl( $url = '' ) { return true; }
-
-
-
-
-
-
-
-
-
-
-
-
-
-/**
- * Actions Link
- * these methods expose some actions that user may use in the view AS CONCEPTS.
- *
- * Each method generates a simple link that implement a class.
- * It is a UI assets stuff to apply css rules and behaviors to that class!
- *
- * Some UI kit like Twitter Bootstrap supplies some action driven components (aka buttons)
- */
-
-
-	public function action( $url = array(), $options = array() ) {
-
-		if ( is_string($options) ) $options = array( 'text'=>$options );
-
-		$options += array( 'text'=>'', 'class'=>'ui-action' );
-
-		if ( strpos($options['class'],'ui-action') === false ) $options['class'] = 'ui-action ' . $options['class'];
+		if(strpos($options['class'], 'ui-action') === false)
+			$options['class'] = 'ui-action ' . $options['class'];
 
 		// data-icon
-		if ( isset($options['icon']) ) {
+		if(isset($options['icon'])) {
 			$options['data-icon'] = $options['icon'];
 			unset($options['icon']);
 		}
 
 		// data-confirm-msg
-		if ( isset($options['confirm']) ) {
-			if ( !is_array($options['confirm']) ) $options['confirm'] = array( 'msg'=>$options['confirm'] );
+		if(isset($options['confirm'])) {
+			if(!is_array($options['confirm']))
+				$options['confirm'] = array('msg' => $options['confirm']);
 			$options['data-confirm-msg'] = $options['confirm']['msg'];
 			unset($options['confirm']);
 		}
@@ -1116,76 +1029,60 @@ class PowerHtmlHelper extends HtmlHelper {
 		$text = $options['text'];
 		unset($options['text']);
 
-		return $this->link( $text, $url, $options );
-
+		return $this->link($text, $url, $options);
 	}
 
-	public function editAction( $url = array(), $options = array() ) {
+	public function editAction($url = array(), $options = array()) {
 
-		if ( is_string($options) ) $options = array( 'text'=>$options );
+		if(is_string($options))
+			$options = array('text' => $options);
 
-		$options += array( 'text'=>'edit', 'class'=>'' );
+		$options += array('text' => 'edit', 'class' => '');
 
-		if ( strpos($options['class'],'ui-action-edit') === false ) {
+		if(strpos($options['class'], 'ui-action-edit') === false) {
 			$options['class'] = 'ui-action-edit ' . $options['class'];
 		}
 
-		return $this->action( $url, $options );
-
+		return $this->action($url, $options);
 	}
 
-	public function deleteAction( $url = array(), $options = array() ) {
+	public function deleteAction($url = array(), $options = array()) {
 
-		if ( is_string($options) ) $options = array( 'text'=>$options );
+		if(is_string($options))
+			$options = array('text' => $options);
 
-		$options += array( 'text'=>'delete', 'class'=>'' );
+		$options += array('text' => 'delete', 'class' => '');
 
-		if ( strpos($options['class'],'ui-action-delete') === false ) {
+		if(strpos($options['class'], 'ui-action-delete') === false) {
 			$options['class'] = 'ui-action-delete ' . $options['class'];
 		}
 
-		return $this->action( $url, $options );
-
+		return $this->action($url, $options);
 	}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/**
- * Less Integration methods
- * It parse a LESS file into a CSS.
- */
+	/**
+	 * Less Integration methods
+	 * It parse a LESS file into a CSS.
+	 */
 	protected function auto_compile_less($lessFilename, $cssFilename) {
 
 
 		// Check if cache & output folders are writable and the less file exists.
-		if (!is_writable(CACHE.'less')) {
-			trigger_error(__d('cake_dev', '"%s" directory is NOT writable.', CACHE.'less'), E_USER_NOTICE);
+		if(!is_writable(CACHE . 'less')) {
+			trigger_error(__d('cake_dev', '"%s" directory is NOT writable.', CACHE . 'less'), E_USER_NOTICE);
 			return;
 		}
 
-		if (file_exists($lessFilename) == false) {
+		if(file_exists($lessFilename) == false) {
 			trigger_error(__d('cake_dev', 'File: "%s" not found.', $lessFilename), E_USER_NOTICE);
 			return;
 		}
 
 		// Cache location
-		$cacheFilename = CACHE.'less'.DS.str_replace('/', '_', str_replace($this->lessFolder->path, '', $lessFilename).".cache");
+		$cacheFilename = CACHE . 'less' . DS . str_replace('/', '_', str_replace($this->lessFolder->path, '', $lessFilename) . ".cache");
 
 		// Load the cache
-		if (file_exists($cacheFilename)) {
+		if(file_exists($cacheFilename)) {
 			$cache = unserialize(file_get_contents($cacheFilename));
 		} else {
 			$cache = $lessFilename;
@@ -1195,12 +1092,13 @@ class PowerHtmlHelper extends HtmlHelper {
 
 		// Minify the css source!
 		// Minification occours only if  debug is turned to 0!
-		if ( class_exists('CssMin') && Configure::read('debug') === 0 ) $new_cache['compiled'] = CssMin::minify($new_cache['compiled']);
+		if(class_exists('CssMin') && Configure::read('debug') === 0)
+			$new_cache['compiled'] = CssMin::minify($new_cache['compiled']);
 
-		if (!is_array($cache) || $new_cache['updated'] > $cache['updated'] || file_exists($cssFilename) === false) {
+		if(!is_array($cache) || $new_cache['updated'] > $cache['updated'] || file_exists($cssFilename) === false) {
 			$cssFile = new File($cssFilename, true);
-			if ($cssFile->write($new_cache['compiled']) === false) {
-				if (!is_writable(dirname($cssFilename))) {
+			if($cssFile->write($new_cache['compiled']) === false) {
+				if(!is_writable(dirname($cssFilename))) {
 					trigger_error(__d('cake_dev', '"%s" directory is NOT writable.', dirname($cssFilename)), E_USER_NOTICE);
 				}
 				trigger_error(__d('cake_dev', 'Failed to write "%s"', $cssFilename), E_USER_NOTICE);
@@ -1209,18 +1107,16 @@ class PowerHtmlHelper extends HtmlHelper {
 			$cacheFile = new File($cacheFilename, true);
 			$cacheFile->write(serialize($new_cache));
 		}
-
 	}
-
 
 // --------------------------- //
 // ---[[   X T Y P E S   ]]--- //
 // --------------------------- //
 
 	public function xtypeLink($mode, $name, $text, $options) {
-		switch ($mode) {
+		switch($mode) {
 			case 'options':
-				if (isset($options['show'])) {
+				if(isset($options['show'])) {
 					$text = $options['show'];
 					unset($options['show']);
 				}
@@ -1230,9 +1126,8 @@ class PowerHtmlHelper extends HtmlHelper {
 		}
 	}
 
-
 	public function xtypeImage($mode, $name, $text, $options) {
-		switch ($mode) {
+		switch($mode) {
 			case 'options':
 				$name = 'img';
 				return array($name, $text, $options);
@@ -1242,7 +1137,7 @@ class PowerHtmlHelper extends HtmlHelper {
 	}
 
 	public function xtypeTable($mode, $name, $text, $options) {
-		switch ($mode) {
+		switch($mode) {
 			case 'options':
 				$options['allowEmpty'] = true;
 				return array($name, $text, $options);
@@ -1251,6 +1146,5 @@ class PowerHtmlHelper extends HtmlHelper {
 				return $this->table($options);
 		}
 	}
-
 
 }
